@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "include/backend.h"
+#include "./include/backend.h"
 
 
 void fillField(int** field) {

@@ -6,8 +6,9 @@
 
 #define TETRAMINO_WIDTH 4
 #define TETRAMINO_HEIGHT 4
-#include <stdbool.h>
 
+#include <stdbool.h>
+#include "./tetramino_collection.h"
 
 typedef enum {
   Start,
@@ -29,12 +30,6 @@ typedef struct {
   int speed;
   int pause;
 } GameInfo_t;
-
-typedef struct {
-  int x;
-  int y;
-  int brick[4][4];
-} Tetramino_t;
 
 typedef enum {
   START,

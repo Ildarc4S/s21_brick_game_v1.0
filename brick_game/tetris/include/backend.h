@@ -1,7 +1,9 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include "objects.h"
+#include "./objects.h"
+
+Tetris_t *initTetris();
 
 int** newField(int width, int height);
 void freeField(int** field, int height);
