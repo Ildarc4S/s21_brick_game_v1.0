@@ -12,15 +12,11 @@ void gameLoop() {
   createBrick(t);
   int a  = 0;
   t->info.curr_tetramino->x = 5;
+  t->info.curr_tetramino->y = 20;
   while (true) {
-    timeout(300); // Устанавливаем таймаут
+    timeout(300); 
     clear();
-    if (a % 2 == 0) {
-      t->right(t, 0);
-      t->down(t, 0);
-    } else {
-      t->left(t, 0);
-    }
+      t->action(t, 0);
     a++;
     printField(&t->info.game_info);
     printTetramino(t->info.curr_tetramino);

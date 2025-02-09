@@ -28,23 +28,42 @@ void getRealBrickSize(Tetramino_t* tetramino, int* min_x, int* max_x, int* max_y
   }
 }
 
-int isCollide(Tetramino_t *tetramino) {
-  int result_code = 0;
+void checkCollideSide(int min_x, int max_x, int max_y,
+                   int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
+  if (min_x <= 0) {
+    *collide_left_x = 1;
+  }
+  
+  if (max_x >= FIELD_WIDTH + 1) {
+    *collide_right_x = 1;
+  }
+
+  if (max_y >= FIELD_HEIGHT + 1) {
+    *collide_bottom_y = 1;
+  }
+}
+
+void collideProcess(Tetramino_t *tetramino, int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
   int min_x = 0;
   int max_x = 0;
   int max_y = 0;
-
+ 
   getRealBrickSize(tetramino, &min_x, &max_x, &max_y);
 
   max_x = tetramino->x + max_x;
   min_x = tetramino->x + min_x;
   max_y = tetramino->y + max_y;
-  
-  if (min_x <= 0 || max_x >= FIELD_WIDTH + 1 || max_y >= FIELD_HEIGHT + 1) {
-    result_code = 1; 
-  }
 
-  return result_code;
+  checkCollideSide(min_x, max_x, max_y, collide_left_x, collide_right_x, collide_bottom_y);
+}
+
+int isCollide(Tetramino_t *tetramino) {
+  int collide_left_x = 0;
+  int collide_right_x = 0;
+  int collide_bottom_y = 0;
+  collideProcess(tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
+
+  return collide_left_x || collide_right_x || collide_bottom_y;
 }
 
 void replaceTetramin(Tetris_t *tetris, Tetramino_t *tetramino) {
@@ -89,7 +108,7 @@ void _down(Tetris_t *tetris, bool hold) {
   if (!tetris) return;
   (void)hold;
   
-  Tetramino_t *tetramino= tetris->info.curr_tetramino; 
+  Tetramino_t *tetramino = tetris->info.curr_tetramino; 
   tetramino->y++;
   if (isCollide(tetramino)) {
     tetramino->y--;
@@ -97,8 +116,48 @@ void _down(Tetris_t *tetris, bool hold) {
   replaceTetramin(tetris, tetramino);
 }
 
+void copyBrick(int brick_one[4][4], int brick_two[4][4]) {
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+    for (int j = 0; j < TETRAMINO_HEIGHT; j++) {
+      brick_one[i][j] = brick_two[i][j]; 
+    }
+  }
+}
 
-void _action(Tetris_t *tetris, bool hold);
+void rotateTetramino(Tetramino_t* tetramino) {
+  int temp[4][4];
+  copyBrick(temp, tetramino->brick);
+
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+     for (int j = 0; j < TETRAMINO_WIDTH; j++) {
+      temp[j][TETRAMINO_WIDTH - i - 1] = tetramino->brick[i][j];
+    }
+  }
+  copyBrick(tetramino->brick, temp);
+}
+
+
+void _action(Tetris_t *tetris, bool hold) {
+  if (!tetris) return;
+  (void)hold;
+  
+  Tetramino_t *tetramino = tetris->info.curr_tetramino; 
+  rotateTetramino(tetramino); 
+
+  int collide_left_x = 0;
+  int collide_right_x = 0;
+  int collide_bottom_y = 0;
+  collideProcess(tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
+  if (collide_left_x) {
+    tetramino->x++;
+  }
+  if (collide_right_x) {
+    tetramino->x--;
+  }
+  if (collide_bottom_y) {
+    tetramino->y--;
+  } 
+}
 
 void userInput(UserAction_t action, int hold) {
    Tetris_t *tetris = createTetris();
@@ -220,7 +279,7 @@ Tetris_t* createTetris() {
   tetris_self->right = _right; 
   tetris_self->down = _down; 
   tetris_self->up = _up; 
-  //tetris_self->action = _action; 
+  tetris_self->action = _action; 
   return tetris_self;
 }
 
