@@ -7,10 +7,6 @@
 Tetris_t* createTetris();
 void actionProcess(UserAction_t action, Tetris_t* tetris, int hold);
 
-void _start_game(struct _tetris_t *tetris) { 
-  tetris->state = SPAWN;
-}
-
 void getRealBrickSize(Tetramino_t* tetramino, int* min_x, int* max_x, int* max_y) {
   *min_x = 4;
   *max_x = -1;
@@ -110,6 +106,39 @@ void insertBrick(Tetris_t *tetris) {
   }
 }
 
+void copyBrick(int brick_one[4][4], int brick_two[4][4]) {
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+    for (int j = 0; j < TETRAMINO_HEIGHT; j++) {
+      brick_one[i][j] = brick_two[i][j]; 
+    }
+  }
+}
+
+void rotateTetramino(Tetramino_t* tetramino) {
+  int temp[4][4];
+  copyBrick(temp, tetramino->brick);
+
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+     for (int j = 0; j < TETRAMINO_WIDTH; j++) {
+      temp[j][TETRAMINO_WIDTH - i - 1] = tetramino->brick[i][j];
+    }
+  }
+  copyBrick(tetramino->brick, temp);
+}
+
+
+void _startGame(struct _tetris_t *tetris) { 
+  tetris->state = SPAWN;
+}
+
+void _pauseGame(struct _tetris_t *tetris) { 
+  tetris->state = PAUSE;
+}
+
+void _exitGame(struct _tetris_t *tetris) { 
+  tetris->state = EXIT;
+}
+
 void _left(struct _tetris_t *tetris, bool hold) {
   if (!tetris) return;
   (void)hold;
@@ -121,7 +150,6 @@ void _left(struct _tetris_t *tetris, bool hold) {
   }
   replaceTetramin(tetris, tetramino);
 }
-
 
 void _right(Tetris_t *tetris, bool hold) {
   if (!tetris) return;
@@ -155,26 +183,6 @@ void _down(Tetris_t *tetris, bool hold) {
   if (is_collide) {
     insertBrick(tetris);
   }
-}
-
-void copyBrick(int brick_one[4][4], int brick_two[4][4]) {
-  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
-    for (int j = 0; j < TETRAMINO_HEIGHT; j++) {
-      brick_one[i][j] = brick_two[i][j]; 
-    }
-  }
-}
-
-void rotateTetramino(Tetramino_t* tetramino) {
-  int temp[4][4];
-  copyBrick(temp, tetramino->brick);
-
-  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
-     for (int j = 0; j < TETRAMINO_WIDTH; j++) {
-      temp[j][TETRAMINO_WIDTH - i - 1] = tetramino->brick[i][j];
-    }
-  }
-  copyBrick(tetramino->brick, temp);
 }
 
 
@@ -321,6 +329,9 @@ Tetris_t* createTetris() {
   tetris_self->down = _down; 
   tetris_self->up = _up; 
   tetris_self->action = _action; 
+  tetris_self->start = _startGame; 
+  tetris_self->exit = _exitGame; 
+  tetris_self->pause = _pauseGame; 
   return tetris_self;
 }
 
@@ -333,7 +344,8 @@ Tetris_t *initTetris() {
 }
 
 GameInfo_t updateCurrentState() {
-  
+  Tetris_t *tetris = initTetris();
+  return tetris->info.game_info;
 }
 
 
