@@ -1,6 +1,8 @@
 #include "include/backend.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ncurses.h>
+
 
 Tetris_t* createTetris();
 void actionProcess(UserAction_t action, Tetris_t* tetris, int hold);
@@ -28,7 +30,26 @@ void getRealBrickSize(Tetramino_t* tetramino, int* min_x, int* max_x, int* max_y
   }
 }
 
-void checkCollideSide(int min_x, int max_x, int max_y,
+int checkCollideOtherBreak(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, int max_x, int max_y) {
+  int result_code = 0;
+  int x = tetramino->x;
+  int y = tetramino->y;
+
+  for (int i = 0; i < TETRAMINO_HEIGHT && !result_code; i++) {
+    for (int j = 0; j < TETRAMINO_WIDTH && !result_code; j++) {
+      if (tetramino->brick[i][j]) {
+        int field_x = x + j;
+        int field_y = y + i;
+        
+        if (tetris->info.game_info.field[field_y][field_x]) {
+          result_code = 1;
+        }
+      }
+    }
+  }
+  return result_code;
+}
+void checkCollideSide(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, int max_x, int max_y,
                    int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
   if (min_x <= 0) {
     *collide_left_x = 1;
@@ -38,12 +59,12 @@ void checkCollideSide(int min_x, int max_x, int max_y,
     *collide_right_x = 1;
   }
 
-  if (max_y >= FIELD_HEIGHT + 1) {
+  if (max_y >= FIELD_HEIGHT + 1 || checkCollideOtherBreak(tetris, tetramino, min_x, max_x, max_y)) {
     *collide_bottom_y = 1;
   }
 }
 
-void collideProcess(Tetramino_t *tetramino, int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
+void collideProcess(Tetris_t *tetris, Tetramino_t *tetramino, int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
   int min_x = 0;
   int max_x = 0;
   int max_y = 0;
@@ -54,14 +75,14 @@ void collideProcess(Tetramino_t *tetramino, int *collide_left_x, int *collide_ri
   min_x = tetramino->x + min_x;
   max_y = tetramino->y + max_y;
 
-  checkCollideSide(min_x, max_x, max_y, collide_left_x, collide_right_x, collide_bottom_y);
+  checkCollideSide(tetris, tetramino, min_x, max_x, max_y, collide_left_x, collide_right_x, collide_bottom_y);
 }
 
-int isCollide(Tetramino_t *tetramino) {
+int isCollide(Tetris_t *tetris, Tetramino_t *tetramino) {
   int collide_left_x = 0;
   int collide_right_x = 0;
   int collide_bottom_y = 0;
-  collideProcess(tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
+  collideProcess(tetris, tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
 
   return collide_left_x || collide_right_x || collide_bottom_y;
 }
@@ -72,6 +93,21 @@ void replaceTetramin(Tetris_t *tetris, Tetramino_t *tetramino) {
       tetris->info.curr_tetramino->brick[i][j] = tetramino->brick[i][j]; 
     }
   }
+  tetris->info.curr_tetramino->x = tetramino->x;
+  tetris->info.curr_tetramino->y = tetramino->y;
+}
+
+void insertBrick(Tetris_t *tetris) {
+  int x = tetris->info.curr_tetramino->x;
+  int y = tetris->info.curr_tetramino->y;
+
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+    for (int j = 0; j < TETRAMINO_HEIGHT; j++) {
+      if (tetris->info.curr_tetramino->brick[i][j]) {
+        tetris->info.game_info.field[y + i][x + j] = tetris->info.curr_tetramino->brick[i][j];
+      }
+    }
+  }
 }
 
 void _left(struct _tetris_t *tetris, bool hold) {
@@ -80,7 +116,7 @@ void _left(struct _tetris_t *tetris, bool hold) {
   
   Tetramino_t *tetramino= tetris->info.curr_tetramino; 
   tetramino->x--;
-  if (isCollide(tetramino)) {
+  if (isCollide(tetris, tetramino)) {
     tetramino->x++;
   }
   replaceTetramin(tetris, tetramino);
@@ -93,7 +129,7 @@ void _right(Tetris_t *tetris, bool hold) {
   
   Tetramino_t *tetramino= tetris->info.curr_tetramino; 
   tetramino->x++;
-  if (isCollide(tetramino)) {
+  if (isCollide(tetris, tetramino)) {
     tetramino->x--;
   }
   replaceTetramin(tetris, tetramino);
@@ -110,10 +146,15 @@ void _down(Tetris_t *tetris, bool hold) {
   
   Tetramino_t *tetramino = tetris->info.curr_tetramino; 
   tetramino->y++;
-  if (isCollide(tetramino)) {
+  int is_collide = 0;
+  if (isCollide(tetris, tetramino)) {
+    is_collide = 1;
     tetramino->y--;
   }
   replaceTetramin(tetris, tetramino);
+  if (is_collide) {
+    insertBrick(tetris);
+  }
 }
 
 void copyBrick(int brick_one[4][4], int brick_two[4][4]) {
@@ -147,7 +188,7 @@ void _action(Tetris_t *tetris, bool hold) {
   int collide_left_x = 0;
   int collide_right_x = 0;
   int collide_bottom_y = 0;
-  collideProcess(tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
+  collideProcess(tetris, tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
   if (collide_left_x) {
     tetramino->x++;
   }

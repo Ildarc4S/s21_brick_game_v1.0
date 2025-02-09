@@ -9,15 +9,14 @@ void sigcat() {
 void gameLoop() {
   Tetris_t *t = createTetris();
   fillField(t->info.game_info.field);
+  t->info.game_info.field[10][5] = 1;
   createBrick(t);
   int a  = 0;
   t->info.curr_tetramino->x = 5;
-  t->info.curr_tetramino->y = 20;
   while (true) {
     timeout(300); 
     clear();
-      t->action(t, 0);
-    a++;
+    t->down(t, 1);
     printField(&t->info.game_info);
     printTetramino(t->info.curr_tetramino);
     refresh();
