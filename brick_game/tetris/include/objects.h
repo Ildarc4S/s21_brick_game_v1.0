@@ -49,7 +49,10 @@ typedef struct {
 
 typedef struct _tetris_t {
   TetrisState_t state;
+
   TetrisInfo_t info;
+  TetraminoCollection_t *collection;
+
   void (*start)(struct _tetris_t* tetris);
   void (*spawn)(struct _tetris_t* tetris);
   void (*left)(struct _tetris_t* tetris, bool hold);

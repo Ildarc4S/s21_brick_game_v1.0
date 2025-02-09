@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include "gui/cli/button.h"
 #include "gui/cli/key.h"
+#include <stdlib.h>
+#include <time.h>
 
 void upKeyPressed(Button btn) {
   userInput(Up, btn.hold);
@@ -49,18 +51,18 @@ void initKeyboardHandlers() {
 }
 
 void gameLoop() {
-  Tetris_t *t = createTetris();
-  fillField(t->info.game_info.field);
-  t->info.game_info.field[10][5] = 1;
-  createBrick(t);
-  int a  = 0;
-  t->info.curr_tetramino->x = 5;
+  Tetris_t *tetris = initTetris();
+  fillField(tetris->info.game_info.field);
+
+  tetris->info.curr_tetramino = tetris->collection->getRandomTetranimo(tetris->collection);
+  tetris->info.curr_tetramino->x = 5;
+
+  timeout(500); 
   while (true) {
-    timeout(300); 
     clear();
-    t->down(t, 1);
-    printField(&t->info.game_info);
-    printTetramino(t->info.curr_tetramino);
+    tetris->down(tetris, 1);
+    printField(&tetris->info.game_info);
+    printTetramino(tetris->info.curr_tetramino);
     refresh();
     sleep(1);
   }
@@ -68,6 +70,7 @@ void gameLoop() {
 
 int main() {
  initNcurses();
+ srand(time(NULL));
   gameLoop();
   endwin();
 }

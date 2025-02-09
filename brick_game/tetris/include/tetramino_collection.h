@@ -12,11 +12,12 @@ typedef struct _tetramino_collection {
 
   int (*getSize)(struct _tetramino_collection *_this);
   int (*setSize)(struct _tetramino_collection *_this, int size);
+  Tetramino_t *(*getRandomTetranimo)(struct _tetramino_collection *_this);
 
   struct _tetramino_collection *(*constructor)();
   void (*destructor)(struct _tetramino_collection *_this);
-} TetramninoCollection_t;
+} TetraminoCollection_t;
 
-TetramninoCollection_t *initTetraminoCollection();
+TetraminoCollection_t *initTetraminoCollection();
 
 #endif

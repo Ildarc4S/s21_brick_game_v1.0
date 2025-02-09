@@ -1,53 +1,53 @@
 #include <stdlib.h>
 #include "./include/tetramino_collection.h"
 
-void initAllTetraminoCollectionBricks(TetramninoCollection_t *this) {
+void initAllTetraminoCollectionBricks(TetraminoCollection_t *this) {
   Tetramino_t tetramino_i = {
     .x = 0,
     .y = 0,
-    .color = COLOR_RED,
+    .color = TETRAMINO_COLOR_RED,
     .brick = {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_o = {
     .x = 0,
     .y = 0,
-    .color = COLOR_PINK,
+    .color = TETRAMINO_COLOR_PINK,
     .brick = {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_t = {
     .x = 0,
     .y = 0,
-    .color = COLOR_BLUE,
+    .color = TETRAMINO_COLOR_BLUE,
     .brick = {{0, 0, 0, 0}, {0, 1, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_s = {
     .x = 0,
     .y = 0,
-    .color = COLOR_GREEN,
+    .color = TETRAMINO_COLOR_GREEN,
     .brick = {{0, 0, 0, 0}, {0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_z = {
     .x = 0,
     .y = 0,
-    .color = COLOR_PURPLE,
+    .color = TETRAMINO_COLOR_PURPLE,
     .brick = {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_j = {
     .x = 0,
     .y = 0,
-    .color = COLOR_ORANGE,
+    .color = TETRAMINO_COLOR_ORANGE,
     .brick = {{0, 0, 0, 0}, {1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_l = {
     .x = 0,
     .y = 0,
-    .color = COLOR_YELLOW,
+    .color = TETRAMINO_COLOR_YELLOW,
     .brick = {{0, 0, 0, 0}, {0, 0, 1, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
@@ -60,24 +60,29 @@ void initAllTetraminoCollectionBricks(TetramninoCollection_t *this) {
   this->pushTetramino(this, tetramino_l); 
 }
 
-int _getTetraminoCollectionSize(TetramninoCollection_t *this) {
+int _getTetraminoCollectionSize(TetraminoCollection_t *this) {
   return this->size;
 }
 
-int _setTetraminoCollectionSize(TetramninoCollection_t *this, int size) {
+int _setTetraminoCollectionSize(TetraminoCollection_t *this, int size) {
   return this->size = size;
 }
 
-void _pushTetraminoToCollection(TetramninoCollection_t *this, Tetramino_t tetramino) {
-  int new_size = this->getSize(this) + 1;
+Tetramino_t *_getRandomTetramino(TetraminoCollection_t *this) {
+   int rand_index = rand() % this->getSize(this);
+   return &this->tetraminos[rand_index];
+}
+
+void _pushTetraminoToCollection(TetraminoCollection_t *this, Tetramino_t tetramino) {
+  int new_size = _getTetraminoCollectionSize(this) + 1;
   this->tetraminos = realloc(this->tetraminos, sizeof(Tetramino_t)*new_size);
   if (this->tetraminos) {
-    this->tetraminos[new_size] = tetramino;
-    this->setSize(this, new_size);  
+    this->tetraminos[new_size-1] = tetramino;
+    this->size = new_size; 
   }
 }
 
-void _destroyTetraminosFromCollection(TetramninoCollection_t *this) {
+void _destroyTetraminosFromCollection(TetraminoCollection_t *this) {
   if (!this) return;
 
   free(this->tetraminos);
@@ -85,18 +90,19 @@ void _destroyTetraminosFromCollection(TetramninoCollection_t *this) {
   this->setSize(this, 0);
 }
 
-void _destructorTetraminoCollection(TetramninoCollection_t *this) {
+void _destructorTetraminoCollection(TetraminoCollection_t *this) {
   if (!this) return;
 
   _destroyTetraminosFromCollection(this);
   free(this);
 }
 
-TetramninoCollection_t *_constructorTetramino() {
-  TetramninoCollection_t *collection = (TetramninoCollection_t*)malloc(sizeof(TetramninoCollection_t));
+TetraminoCollection_t *_constructorTetramino() {
+  TetraminoCollection_t *collection = (TetraminoCollection_t*)malloc(sizeof(TetraminoCollection_t));
 
   collection->setSize = _setTetraminoCollectionSize;
   collection->getSize = _getTetraminoCollectionSize;
+  collection->getRandomTetranimo = _getRandomTetramino;
   collection->pushTetramino = _pushTetraminoToCollection;
 
   collection->constructor = _constructorTetramino;
@@ -108,8 +114,8 @@ TetramninoCollection_t *_constructorTetramino() {
   return collection;
 }
 
-TetramninoCollection_t *initTetraminoCollection() {
-  static TetramninoCollection_t *this = NULL;
+TetraminoCollection_t *initTetraminoCollection() {
+  static TetraminoCollection_t *this = NULL;
 
   if (!NULL) {
     this = _constructorTetramino();
