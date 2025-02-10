@@ -6,7 +6,7 @@
 typedef struct _button {
   int key;
   bool hold;
-} Button;
+} Button_t;
 
 #endif
 
