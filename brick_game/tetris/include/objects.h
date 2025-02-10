@@ -9,6 +9,8 @@
 
 #include <stdbool.h>
 #include "./tetramino_collection.h"
+#include <sys/time.h>
+#include <time.h>
 
 typedef enum {
   Start,
@@ -38,13 +40,15 @@ typedef enum {
   SHIFT,
   PAUSE,
   GAME_OVER,
-  EXIT
+  EXIT,
+  ATTACH
 } TetrisState_t;
 
 typedef struct {
   GameInfo_t game_info;
   Tetramino_t *curr_tetramino;
   Tetramino_t *next_tetramino;
+  struct timeval last_time;
 } TetrisInfo_t;
 
 typedef struct _tetris_t {

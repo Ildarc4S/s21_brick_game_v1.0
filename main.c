@@ -56,26 +56,24 @@ void gameLoop() {
   initKeyboardHandlers();
   fillField(tetris->info.game_info.field);
 
-  tetris->info.curr_tetramino = tetris->collection->getRandomTetranimo(tetris->collection);
-  tetris->info.curr_tetramino->x = 5;
-
-  timeout(500); 
+  timeout(0);
   while (tetris->state != EXIT) {
-    clear();
+    redrawwin(stdscr); // Перерисовываем без очистки экрана
     kb->listen(kb);      
-    mvprintw(20, 20, "|%d|", tetris->state);
-//   printField(&tetris->info.game_info);
+
+    printField(&tetris->info.game_info);
     printTetramino(tetris->info.curr_tetramino);
-    refresh();
-//    sleep(1);
-    struct timespec ts = {0, 999999}; // 100 мс
-    nanosleep(&ts, NULL);
+    mvprintw(20, 40, "%d", tetris->state);
+    wnoutrefresh(stdscr); // Подготавливаем изменения
+    doupdate();           // Выводим их одним кадром
+
+    usleep(50000); // Ждём 30 мс (уменьшает нагрузку и мигание)
   }
 }
 
 int main() {
  initNcurses();
  srand(time(NULL));
-  gameLoop();
-  endwin();
+ gameLoop();
+ endwin();
 }

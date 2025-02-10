@@ -29,10 +29,7 @@ void _destructorKeyboard(Keyboard_t *kb);
 void _listen(Keyboard_t *this) {
   int key = getch();
   if (key == ERR) {
-    mvprintw(10, 10, "@");
     return;
-  } else {
-    mvprintw(10, 10, "#");
   }
   
   Button_t button = {.key = key};
@@ -41,7 +38,6 @@ void _listen(Keyboard_t *this) {
       this->keyboard_listen_list[i].listenerFunc(button);
     }
   }
-  mvprintw(0, 0, "Обработан ввод клавиши %d", key);
 }
 
 Keyboard_t *_constructorKeyboard() {

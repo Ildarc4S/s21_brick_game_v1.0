@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <ncurses.h>
-
+#include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 
 Tetris_t* createTetris();
 void actionProcess(UserAction_t action, Tetris_t* tetris, int hold);
@@ -129,6 +131,32 @@ void rotateTetramino(Tetramino_t* tetramino) {
 
 void _startGame(struct _tetris_t *tetris) { 
   tetris->state = SPAWN;
+  tetris->spawn(tetris);
+}
+
+void _spawn(Tetris_t *this) {
+  if (!this) return;
+
+  this->state = MOVE; 
+  if (!this->info.next_tetramino) {
+    this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
+  }
+  
+  this->info.curr_tetramino = this->info.next_tetramino;
+  this->info.curr_tetramino->x = FIELD_WIDTH/2;
+  this->info.curr_tetramino->y = 0;
+  
+  this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
+
+  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
+    for (int  j = 0;  j < TETRAMINO_WIDTH; j++) {
+      if (this->info.next_tetramino->brick[i][j]) {
+        this->info.game_info.next[i][j] = this->info.next_tetramino->color;
+      }
+    }
+  }
+  this->state = MOVE;
+
 }
 
 void _pauseGame(struct _tetris_t *tetris) { 
@@ -181,6 +209,7 @@ void _down(Tetris_t *tetris, bool hold) {
   }
   replaceTetramin(tetris, tetramino);
   if (is_collide) {
+    tetris->state = ATTACH;
     insertBrick(tetris);
   }
 }
@@ -230,7 +259,6 @@ void userInput(UserAction_t action, int hold) {
            break;
 
          default:
-           tetris->state = MOVE;
            break;
        };
      case MOVE: 
@@ -268,7 +296,7 @@ void userInput(UserAction_t action, int hold) {
            tetris->exit(tetris);
            break;
          case Start:
-           tetris->state = SPAWN;
+           tetris->start(tetris);
            break;
          case Pause:
            tetris->pause(tetris);
@@ -281,7 +309,7 @@ void userInput(UserAction_t action, int hold) {
     case GAME_OVER: 
        switch (action) {
          case Start:
-           tetris->spawn(tetris);
+           tetris->start(tetris);
            break;
          case Terminate:
            tetris->exit(tetris);
@@ -291,6 +319,16 @@ void userInput(UserAction_t action, int hold) {
            break;
        };
        break;
+    case ATTACH:
+      switch (action) {
+        case Terminate:
+          tetris->exit(tetris);
+          break;
+        default:
+          tetris->spawn(tetris); 
+          break;
+      };
+      break;
 
     default:
       break;
@@ -322,6 +360,7 @@ Tetris_t* createTetris() {
       .speed = 0,
       .pause = 0
     },
+    .last_time = 0,
     .curr_tetramino = NULL,
     .next_tetramino = NULL
   };
@@ -330,7 +369,8 @@ Tetris_t* createTetris() {
   tetris_self->down = _down; 
   tetris_self->up = _up; 
   tetris_self->action = _action; 
-  tetris_self->start = _startGame; 
+  tetris_self->start = _startGame;
+  tetris_self->spawn = _spawn;
   tetris_self->exit = _exitGame; 
   tetris_self->pause = _pauseGame; 
   tetris_self->collection = initTetraminoCollection();
@@ -346,8 +386,21 @@ Tetris_t *initTetris() {
   return tetris;
 }
 
+long timeDiff(struct timeval start, struct timeval end) {
+  return (end.tv_sec - start.tv_sec) * 1000 +
+         (end.tv_usec - start.tv_usec) / 1000;
+}
+
 GameInfo_t updateCurrentState() {
   Tetris_t *tetris = initTetris();
+  if (tetris->state == MOVE) {
+    //struct timeval current_time;
+    //gettimeofday(&current_time, NULL);  
+//    if (timeDiff(tetris->info.last_time, current_time) >= 10) {
+      //tetris->down(tetris, 0);
+     // tetris->info.last_time = current_time;  // Обновление времени последнего вызова
+ ///   }
+  }
   return tetris->info.game_info;
 }
 
