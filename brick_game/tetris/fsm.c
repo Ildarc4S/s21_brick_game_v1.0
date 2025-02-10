@@ -28,7 +28,7 @@ void getRealBrickSize(Tetramino_t* tetramino, int* min_x, int* max_x, int* max_y
   }
 }
 
-int checkCollideOtherBreak(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, int max_x, int max_y) {
+int checkCollideOtherBreak(Tetris_t *tetris, Tetramino_t *tetramino) {
   int result_code = 0;
   int x = tetramino->x;
   int y = tetramino->y;
@@ -39,7 +39,7 @@ int checkCollideOtherBreak(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, 
         int field_x = x + j;
         int field_y = y + i;
         
-        if (tetris->info.game_info.field[field_y][field_x]) {
+        if (tetris->info.game_info.field[field_y][field_x] && tetramino->brick[i][j]) {
           result_code = 1;
         }
       }
@@ -47,6 +47,7 @@ int checkCollideOtherBreak(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, 
   }
   return result_code;
 }
+
 void checkCollideSide(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, int max_x, int max_y,
                    int *collide_left_x, int *collide_right_x, int *collide_bottom_y) {
   if (min_x <= 0) {
@@ -57,7 +58,7 @@ void checkCollideSide(Tetris_t *tetris, Tetramino_t *tetramino, int min_x, int m
     *collide_right_x = 1;
   }
 
-  if (max_y >= FIELD_HEIGHT + 1 || checkCollideOtherBreak(tetris, tetramino, min_x, max_x, max_y)) {
+  if (max_y >= FIELD_HEIGHT + 1 || checkCollideOtherBreak(tetris, tetramino)) {
     *collide_bottom_y = 1;
   }
 }
@@ -137,25 +138,30 @@ void _startGame(struct _tetris_t *tetris) {
 void _spawn(Tetris_t *this) {
   if (!this) return;
 
-  this->state = MOVE; 
   if (!this->info.next_tetramino) {
     this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
   }
   
   this->info.curr_tetramino = this->info.next_tetramino;
   this->info.curr_tetramino->x = FIELD_WIDTH/2;
-  this->info.curr_tetramino->y = 0;
+  this->info.curr_tetramino->y = 1;
   
   this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
 
   for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
-    for (int  j = 0;  j < TETRAMINO_WIDTH; j++) {
+    for (int j = 0;  j < TETRAMINO_WIDTH; j++) {
       if (this->info.next_tetramino->brick[i][j]) {
         this->info.game_info.next[i][j] = this->info.next_tetramino->color;
       }
     }
   }
+  
   this->state = MOVE;
+
+  if (checkCollideOtherBreak(this, this->info.curr_tetramino)) {
+    mvprintw(21, 40, "Game over");
+    this->state = GAME_OVER; 
+  }
 
 }
 
@@ -211,30 +217,89 @@ void _down(Tetris_t *tetris, bool hold) {
   if (is_collide) {
     tetris->state = ATTACH;
     insertBrick(tetris);
+    tetris->info.curr_tetramino = NULL;
   }
 }
+void computeCollisionSides(Tetris_t *tetris, Tetramino_t *tetramino, 
+                           int *collide_left_x, int *collide_right_x, 
+                           int *collide_top_y, int *collide_bottom_y) {
+  if (!tetris || !tetramino) return;
 
+  // Сбрасываем флаги столкновения
+  *collide_left_x = *collide_right_x = *collide_top_y = *collide_bottom_y = -1;
+
+  int min_x, max_x, min_y, max_y;
+  
+  // Получаем реальные размеры фигуры
+  getRealBrickSize(tetramino, &min_x, &max_x, &max_y);
+  min_x += tetramino->x;
+  max_x += tetramino->x;
+  max_y += tetramino->y;
+  min_y = tetramino->y; // Верхняя граница фигуры (минимальный Y)
+
+  int **matrix = tetris->info.game_info.field; // Игровое поле
+
+  // Проверка столкновения с левой стенкой
+  if (min_x < 0) {
+    *collide_left_x = min_x;
+  } else {
+    for (int y = min_y; y <= max_y; y++) {
+      if (matrix[y][min_x] != 0) { // Если клетка занята
+        *collide_left_x = min_x;
+        break;
+      }
+    }
+  }
+
+  // Проверка столкновения с правой стенкой
+  if (max_x >= FIELD_WIDTH) {
+    *collide_right_x = max_x;
+  } else {
+    for (int y = min_y; y <= max_y; y++) {
+      if (matrix[y][max_x] != 0) {
+        *collide_right_x = max_x;
+        break;
+      }
+    }
+  }
+
+  // Проверка столкновения с нижней границей
+  if (max_y >= FIELD_HEIGHT) {
+    *collide_bottom_y = max_y;
+  } else {
+    for (int x = min_x; x <= max_x; x++) {
+      if (matrix[max_y][x] != 0) {
+        *collide_bottom_y = max_y;
+        break;
+      }
+    }
+  }
+
+  // Проверка столкновения с верхней границей (например, при появлении)
+  if (min_y < 0) {
+    *collide_top_y = min_y;
+  } else {
+    for (int x = min_x; x <= max_x; x++) {
+      if (matrix[min_y][x] != 0) {
+        *collide_top_y = min_y;
+        break;
+      }
+    }
+  }
+}
 
 void _action(Tetris_t *tetris, bool hold) {
   if (!tetris) return;
   (void)hold;
   
   Tetramino_t *tetramino = tetris->info.curr_tetramino; 
+  int temp[4][4];
+  copyBrick(temp, tetramino->brick);
   rotateTetramino(tetramino); 
 
-  int collide_left_x = 0;
-  int collide_right_x = 0;
-  int collide_bottom_y = 0;
-  collideProcess(tetris, tetramino, &collide_left_x, &collide_right_x, &collide_bottom_y);
-  if (collide_left_x) {
-    tetramino->x++;
+  if (isCollide(tetris, tetramino)) {
+    copyBrick(tetramino->brick, temp);
   }
-  if (collide_right_x) {
-    tetramino->x--;
-  }
-  if (collide_bottom_y) {
-    tetramino->y--;
-  } 
 }
 
 void userInput(UserAction_t action, int hold) {
@@ -307,6 +372,7 @@ void userInput(UserAction_t action, int hold) {
        };
        break;
     case GAME_OVER: 
+       mvprintw(19, 40, "State");
        switch (action) {
          case Start:
            tetris->start(tetris);
@@ -319,16 +385,6 @@ void userInput(UserAction_t action, int hold) {
            break;
        };
        break;
-    case ATTACH:
-      switch (action) {
-        case Terminate:
-          tetris->exit(tetris);
-          break;
-        default:
-          tetris->spawn(tetris); 
-          break;
-      };
-      break;
 
     default:
       break;
@@ -394,12 +450,14 @@ long timeDiff(struct timeval start, struct timeval end) {
 GameInfo_t updateCurrentState() {
   Tetris_t *tetris = initTetris();
   if (tetris->state == MOVE) {
-    //struct timeval current_time;
-    //gettimeofday(&current_time, NULL);  
-//    if (timeDiff(tetris->info.last_time, current_time) >= 10) {
-      //tetris->down(tetris, 0);
-     // tetris->info.last_time = current_time;  // Обновление времени последнего вызова
- ///   }
+    struct timeval current_time;
+    gettimeofday(&current_time, NULL);  
+    if (timeDiff(tetris->info.last_time, current_time) >= 1010) {
+      tetris->down(tetris, 0);
+      tetris->info.last_time = current_time;  // Обновление времени последнего вызова
+    }
+  } else if (tetris->state == ATTACH) {
+    tetris->spawn(tetris);
   }
   return tetris->info.game_info;
 }

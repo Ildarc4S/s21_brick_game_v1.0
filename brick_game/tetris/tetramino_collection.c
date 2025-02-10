@@ -12,42 +12,42 @@ void initAllTetraminoCollectionBricks(TetraminoCollection_t *this) {
   Tetramino_t tetramino_o = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_PINK,
+    .color = TETRAMINO_COLOR_BLUE,
     .brick = {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_t = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_BLUE,
+    .color = TETRAMINO_COLOR_GREEN,
     .brick = {{0, 0, 0, 0}, {0, 1, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_s = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_GREEN,
+    .color = TETRAMINO_COLOR_YELLOW,
     .brick = {{0, 0, 0, 0}, {0, 1, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_z = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_PURPLE,
+    .color = TETRAMINO_COLOR_MAGNETA,
     .brick = {{0, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_j = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_ORANGE,
+    .color = TETRAMINO_COLOR_MAGNETA,
     .brick = {{0, 0, 0, 0}, {1, 0, 0, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 
   Tetramino_t tetramino_l = {
     .x = 0,
     .y = 0,
-    .color = TETRAMINO_COLOR_YELLOW,
+    .color = TETRAMINO_COLOR_CYAN,
     .brick = {{0, 0, 0, 0}, {0, 0, 1, 0}, {1, 1, 1, 0}, {0, 0, 0, 0}}
   };
 

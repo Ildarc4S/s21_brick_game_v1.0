@@ -12,15 +12,16 @@ void initNcurses() {
 }
 
 void initColorPairs() {
-  init_pair(1, COLOR_GREEN, COLOR_BLACK);
-  init_pair(2, COLOR_CYAN, COLOR_BLACK);
-  init_pair(3, COLOR_RED, COLOR_BLACK);
-  init_pair(4, COLOR_BLUE, COLOR_BLACK);
-  init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(6, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_RED, COLOR_RED, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_MAGNETA, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(TETRAMINO_COLOR_BLUE, COLOR_BLUE, COLOR_BLACK); 
 }
 
 void printField(GameInfo_t *game) {
+  GameInfo_t g = updateCurrentState();
   for (int i = 0; i < FIELD_HEIGHT + 2; i++) {
     for (int j = 0; j < FIELD_WIDTH + 2; j++) {
       if (game->field[i][j]) {
@@ -38,7 +39,9 @@ void printTetramino(Tetramino_t *tetramino) {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       if (tetramino->brick[i][j]) {
+        attron(COLOR_PAIR(tetramino->color));
         mvprintw(tetramino->y + i, (tetramino->x + j) * 2, "[]");
+        attroff(COLOR_PAIR(tetramino->color));
       }
     }
   }
