@@ -6,35 +6,35 @@
 #include <stdlib.h>
 #include <time.h>
 
-void upKeyPressed(Button btn) {
+void upKeyPressed(Button_t btn) {
   userInput(Up, btn.hold);
 }
 
-void leftKeyPressed(Button btn) {
+void leftKeyPressed(Button_t btn) {
   userInput(Left, btn.hold);
 }
 
-void rightKeyPressed(Button btn) {
+void rightKeyPressed(Button_t btn) {
   userInput(Right, btn.hold);
 }
 
-void downKeyPressed(Button btn) {
+void downKeyPressed(Button_t btn) {
   userInput(Down, btn.hold);
 }
 
-void spaceKeyPressed(Button btn) {
+void spaceKeyPressed(Button_t btn) {
   userInput(Action, btn.hold);
 }
 
-void startKeyPressed(Button btn) {
+void startKeyPressed(Button_t btn) {
   userInput(Start, btn.hold);
 }
 
-void pauseKeyPressed(Button btn) {
+void pauseKeyPressed(Button_t btn) {
   userInput(Pause, btn.hold);
 }
 
-void exitKeyPressed(Button btn) {
+void exitKeyPressed(Button_t btn) {
   userInput(Terminate, btn.hold);
 }
 
@@ -47,24 +47,29 @@ void initKeyboardHandlers() {
   keyboard->addKeyboardListener(keyboard, ' ', spaceKeyPressed);
   keyboard->addKeyboardListener(keyboard, 's', startKeyPressed);
   keyboard->addKeyboardListener(keyboard, 'p', pauseKeyPressed);
-  keyboard->addKeyboardListener(keyboard, KEY_EXIT, exitKeyPressed);
+  keyboard->addKeyboardListener(keyboard, 'q', exitKeyPressed);
 }
 
 void gameLoop() {
   Tetris_t *tetris = initTetris();
+  Keyboard_t *kb = initKeyboard();
+  initKeyboardHandlers();
   fillField(tetris->info.game_info.field);
 
   tetris->info.curr_tetramino = tetris->collection->getRandomTetranimo(tetris->collection);
   tetris->info.curr_tetramino->x = 5;
 
   timeout(500); 
-  while (true) {
+  while (tetris->state != EXIT) {
     clear();
-    tetris->down(tetris, 1);
-    printField(&tetris->info.game_info);
+    kb->listen(kb);      
+    mvprintw(20, 20, "|%d|", tetris->state);
+//   printField(&tetris->info.game_info);
     printTetramino(tetris->info.curr_tetramino);
     refresh();
-    sleep(1);
+//    sleep(1);
+    struct timespec ts = {0, 999999}; // 100 мс
+    nanosleep(&ts, NULL);
   }
 }
 
