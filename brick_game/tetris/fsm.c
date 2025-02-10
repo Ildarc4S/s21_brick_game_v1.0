@@ -209,32 +209,31 @@ void _action(Tetris_t *tetris, bool hold) {
 }
 
 void userInput(UserAction_t action, int hold) {
-   Tetris_t *tetris = createTetris();
+   Tetris_t *tetris = initTetris();
    switch (tetris->state) {
      case START:
        switch (action) {
          case Terminate:
            tetris->exit(tetris);
            break;
-           
+         case Start:
+           tetris->start(tetris);
+           break;
          default:
            break;
        };
        break;
      case SPAWN:
-     case MOVE: 
        switch (action) {
          case Terminate:
            tetris->exit(tetris);
            break;
-         case Pause:
-           tetris->pause(tetris);
-           break;
 
          default:
+           tetris->state = MOVE;
            break;
        };
-       break;
+     case MOVE: 
      case SHIFT: 
        switch (action) {
          case Terminate:
@@ -242,6 +241,7 @@ void userInput(UserAction_t action, int hold) {
            break;
          case Pause:
            tetris->pause(tetris);
+           break;
          case Left:
            tetris->left(tetris, hold);
            break;
@@ -256,6 +256,7 @@ void userInput(UserAction_t action, int hold) {
            break;
          case Action:
            tetris->action(tetris, hold);
+           break;
 
          default:
            break;
@@ -267,6 +268,8 @@ void userInput(UserAction_t action, int hold) {
            tetris->exit(tetris);
            break;
          case Start:
+           tetris->state = SPAWN;
+           break;
          case Pause:
            tetris->pause(tetris);
            break;
