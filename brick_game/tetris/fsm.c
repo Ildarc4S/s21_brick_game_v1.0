@@ -137,6 +137,7 @@ void _startGame(Tetris_t *tetris) {
     tetris->info.game_info.pause = 0;
     tetris->state = SPAWN;
     tetris->spawn(tetris);
+    tetris->info.game_info.high_score = tetris->db.read(&tetris->db);
   } else if (tetris->state == PAUSE) {
     tetris->info.game_info.pause = 0;
     tetris->state = MOVE;
@@ -151,6 +152,7 @@ void _startGame(Tetris_t *tetris) {
 
 void _spawn(Tetris_t *this) {
   if (!this) return;
+
 
   if (!this->info.next_tetramino) {
     this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
@@ -175,6 +177,7 @@ void _spawn(Tetris_t *this) {
 
   if (checkCollideOtherBreak(this, this->info.curr_tetramino)) {
     this->info.game_info.pause = -1;
+    this->db.write(&this->db, this->info.game_info.high_score);
     this->state = GAME_OVER; 
   }
 
@@ -185,8 +188,9 @@ void _pauseGame(Tetris_t *tetris) {
   tetris->state = PAUSE;
 }
 
-void _exitGame(Tetris_t *tetris) { 
-  tetris->state = EXIT;
+void _exitGame(Tetris_t *this) { 
+  this->db.write(&this->db, this->info.game_info.high_score);
+  this->state = EXIT;
 }
 
 void _left(Tetris_t *tetris, bool hold) {
@@ -220,14 +224,22 @@ void _up(Tetris_t *tetris, bool hold) {
 
 void _down(Tetris_t *tetris, bool hold) {
   if (!tetris) return;
-  (void)hold;
   
   Tetramino_t *tetramino = tetris->info.curr_tetramino; 
-  tetramino->y++;
   int is_collide = 0;
-  if (isCollide(tetris, tetramino)) {
+  
+  if (!hold) {
+    tetramino->y++;
+    if (isCollide(tetris, tetramino)) {
+      is_collide = 1;
+      tetramino->y--;
+    } 
+  } else {
+    while(!isCollide(tetris, tetramino)) {
+      tetramino->y++; 
+    }
+    tetramino->y--; 
     is_collide = 1;
-    tetramino->y--;
   }
   replaceTetramin(tetris, tetramino);
   if (is_collide) {
@@ -318,7 +330,7 @@ void _action(Tetris_t *tetris, bool hold) {
   }
 }
 
-void userInput(UserAction_t action, int hold) {
+void userInput(UserAction_t action, bool hold) {
    Tetris_t *tetris = initTetris();
    switch (tetris->state) {
      case START:
@@ -409,6 +421,9 @@ void createBrick(Tetris_t *tetris) {
 
 void _updateTetrisScore(Tetris_t *this) {
   this->info.game_info.score = this->level.score.getScore(&this->level.score);
+  if (this->info.game_info.score >= this->info.game_info.high_score) {
+    this->info.game_info.high_score = this->info.game_info.score; 
+  }
 }
 
 void _updateTetrisLevel(Tetris_t *this) {
@@ -417,7 +432,7 @@ void _updateTetrisLevel(Tetris_t *this) {
 
 Tetris_t* createTetris() {
   Tetris_t *tetris_self = (Tetris_t*)malloc(sizeof(Tetris_t));
-  if (!tetris_self) return NULL; // Проверка на успешное выделение памяти
+  if (!tetris_self) return NULL; 
 
   tetris_self->state = START;
   tetris_self->info = (TetrisInfo_t) { 
@@ -434,9 +449,11 @@ Tetris_t* createTetris() {
     .next_tetramino = NULL
   };
   fillField(tetris_self->info.game_info.field);
-
+  
+  tetris_self->db = initDatabase("./brick_game/db/tetris_db.txt");
   tetris_self->level = constructorLevel();
-  tetris_self->timer = initTimer(),
+  
+  tetris_self->timer = constructorTimer(),
   tetris_self->left = _left; 
   tetris_self->right = _right; 
   tetris_self->down = _down; 
@@ -510,9 +527,9 @@ void cleanLines(Tetris_t *this) {
 GameInfo_t updateCurrentState() {
   Tetris_t *tetris = initTetris();
   if (tetris->state == MOVE) {
-    if (tetris->timer->calcDiff(tetris->timer) >= tetris->timer->getTick(tetris->timer)) {
+    if (tetris->timer.calcDiff(&tetris->timer) >= tetris->timer.getTick(&tetris->timer)) {
       tetris->down(tetris, 0);
-      tetris->timer->updateLastTime(tetris->timer);
+      tetris->timer.updateLastTime(&tetris->timer);
     }
   } else if (tetris->state == ATTACH) {
     tetris->spawn(tetris);

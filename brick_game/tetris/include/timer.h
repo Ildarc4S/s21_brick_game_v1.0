@@ -15,6 +15,6 @@ typedef struct _timer {
   void (*setTick)(struct _timer *_this, long tick);
 } Timer_t;
 
-Timer_t *initTimer();
+Timer_t constructorTimer();
 
 #endif  // TIMER_H

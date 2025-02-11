@@ -42,6 +42,7 @@ typedef struct _game_field {
 typedef struct _window {
   Panel_t nextFigurePanel;
   Panel_t scorePanel;
+  Panel_t high_score_panel;
   Panel_t levelPanel;
   Panel_t helpPanel;
   GameField_t game_field;

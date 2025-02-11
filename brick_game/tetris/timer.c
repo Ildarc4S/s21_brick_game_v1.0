@@ -25,34 +25,25 @@ void _setTimerTick(Timer_t *this, long tick) {
   this->tick = tick; 
 }
 
-Timer_t *constructorTimer() {
-  Timer_t *timer = malloc(sizeof(Timer_t));
-  if (timer != NULL) {
-    struct timeval time = {0};
-    gettimeofday(&time, NULL);
+Timer_t constructorTimer() {
+  struct timeval time = {0};
+  gettimeofday(&time, NULL);
     
-    timer->current_time = time;
-    timer->last_time = time;
+  return (Timer_t) {
+    .current_time = time,
+    .last_time = time,
 
-    timer->updateCurrenTime = _updateCurrentTime;
-    timer->updateLastTime = _updateLastTime;
-    timer->calcDiff = _calcTimeDiff;
+    .updateCurrenTime = _updateCurrentTime,
+    .updateLastTime = _updateLastTime,
+    .calcDiff = _calcTimeDiff,
 
-    timer->getTick = _getTimerTick;
-    timer->setTick = _setTimerTick;
+    .getTick = _getTimerTick,
+    .setTick = _setTimerTick,
 
-    timer->tick = 1500;
-  }
-  return timer;
+    .tick = 1500
+  };
 }
 
-Timer_t *initTimer() {
-  static Timer_t *timer = NULL;
-  if (!timer) {
-    timer = constructorTimer();    
-  }
-  return timer;
-}
 
 
 

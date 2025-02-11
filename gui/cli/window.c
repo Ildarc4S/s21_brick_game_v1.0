@@ -25,26 +25,33 @@ void drawFigure(Panel_t *this, GameInfo_t game_info) {
 
 void _drawPanel(Panel_t *this) {
   GameInfo_t game_info = updateCurrentState(); 
-  _drawPanelHead(this); 
+  _drawPanelHead(this);
 
   if (this->size != 0) {
     for (int i = 0; i < this->size; i++) {
       mvprintw(this->y+i, this->x*2, "%s", this->text[i]);
     }
- } else if (this->score != -1) {
-      mvprintw(this->y, this->x*2, "%d", game_info.score);
- } else if (this->level != -1) {
-      mvprintw(this->y, this->x*2, "%d", game_info.level);
- } else {
+  } else if (this->level == -2) {
+    this->score = game_info.high_score;
+    mvprintw(this->y, this->x*2, "%d", this->score);
+  } else if (this->score != -1) {
+    this->score = game_info.score;
+    mvprintw(this->y, this->x*2, "%d", this->score);
+  } else if (this->level != -1) {
+    this->level = game_info.level;
+    mvprintw(this->y, this->x*2, "%d", this->level);
+  } else {
     drawFigure(this, game_info);
- }
+  }
 }
 
 void _drawWindow(Window_t *this) {
   this->game_field.drawField(&this->game_field);
   this->game_field.drawTetramino(&this->game_field);
+
   this->helpPanel.draw(&this->helpPanel);
   this->scorePanel.draw(&this->scorePanel);
+  this->high_score_panel.draw(&this->high_score_panel);
   this->levelPanel.draw(&this->levelPanel);
   this->nextFigurePanel.draw(&this->nextFigurePanel);
 }
@@ -138,6 +145,16 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .color = PANEL_GREEN_COLOR,
         .score = 0,
         .level = -1,
+        .draw = _drawPanel,
+     },
+     .high_score_panel = (Panel_t) {
+        .x = 50,
+        .y = 30,
+        .head_text = "Score:",
+        .size = 0,
+        .color = PANEL_RED_COLOR,
+        .score = 0,
+        .level = -2,
         .draw = _drawPanel,
      },
      .levelPanel = (Panel_t) {

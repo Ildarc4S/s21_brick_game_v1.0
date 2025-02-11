@@ -58,7 +58,7 @@ void gameLoop() {
   initKeyboardHandlers();
   Window_t window = _constructorWindow(tetris);
 
-  timeout(0);
+  timeout(500);
   while (tetris->state != EXIT) {
     redrawwin(stdscr); // Перерисовываем без очистки экрана
     kb->listen(kb);      
@@ -68,7 +68,7 @@ void gameLoop() {
     wnoutrefresh(stdscr); // Подготавливаем изменения
     doupdate();           // Выводим их одним кадром
 
-    usleep(50000); // Ждём 30 мс (уменьшает нагрузку и мигание)
+  //  usleep(50000); // Ждём 30 мс (уменьшает нагрузку и мигание)
   }
 }
 

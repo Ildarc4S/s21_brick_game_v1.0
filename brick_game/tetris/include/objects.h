@@ -11,6 +11,7 @@
 #include "./tetramino_collection.h"
 #include "./timer.h"
 #include "./level_manager.h"
+#include "./data_base.h"
 
 typedef enum {
   Start,
@@ -55,8 +56,9 @@ typedef struct _tetris {
   TetrisInfo_t info;
 
   TetraminoCollection_t *collection;
-  Timer_t *timer;
+  Timer_t timer;
   Level_t level;
+  DataBase_t db;
 
   void (*start)(struct _tetris* tetris);
   void (*spawn)(struct _tetris* tetris);
@@ -73,7 +75,7 @@ typedef struct _tetris {
   void (*updateLevel)(struct _tetris *_this);
 } Tetris_t;
 
-void userInput(UserAction_t action, int hold);
+void userInput(UserAction_t action, bool hold);
 
 GameInfo_t updateCurrentState();
 
