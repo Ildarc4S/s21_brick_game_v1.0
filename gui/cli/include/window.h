@@ -1,14 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "./../../../brick_game/tetris/include/objects.h"
-
-typedef enum {
-  PANEL_GREEN_COLOR = 7,
-  PANEL_RED_COLOR,
-  PANEL_YELLOW_COLOR,
-  PANEL_BLUE_COLOR,
-} Color_t;
+#include "./../../../brick_game/tetris/include/tetris.h"
+#include "./color.h"
+#include "./frontend.h"
 
 typedef struct _panel {
   int x;
@@ -17,8 +12,8 @@ typedef struct _panel {
   char head_text[50];
   char text[50][50];
   int size;
-  int score;
-  int level;
+  int value;
+  int mode;
 
   Color_t color;
 
@@ -34,9 +29,9 @@ typedef struct _game_field {
 
   Tetris_t *tetris;
 
-  void (*drawField)(struct _game_field *_this);
-  void (*drawTetramino)(struct _game_field *_this);
-  void (*updateTetramino)(struct _game_field *_this, Tetris_t *tetris);
+  void (*drawField)(struct _game_field *);
+  void (*drawTetramino)(struct _game_field *);
+  void (*updateTetramino)(struct _game_field *, Tetris_t *);
 } GameField_t;
 
 typedef struct _window {
@@ -48,7 +43,7 @@ typedef struct _window {
   Panel_t speed_panel;
   GameField_t game_field;
 
-  void (*draw)(struct _window *_this);
+  void (*draw)(struct _window *);
 } Window_t;
 
 Window_t _constructorWindow(Tetris_t *tetris);

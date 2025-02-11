@@ -1,6 +1,4 @@
 #include "./include/window.h"
-#include <ncurses.h>
-#include "../../brick_game/tetris/include/objects.h"
 
 void _drawPanelHead(Panel_t *this) {
   attron(COLOR_PAIR(this->color));
@@ -32,18 +30,18 @@ void _drawPanel(Panel_t *this) {
     for (int i = 0; i < this->size; i++) {
       mvprintw(this->y+i, this->x*2, "%s", this->text[i]);
     }
-  } else if (this->level == -3) {
-    this->score = game_info.speed;
-    mvprintw(this->y, this->x*2, "%d", this->score);
-  } else if (this->level == -2) {
-    this->score = game_info.high_score;
-    mvprintw(this->y, this->x*2, "%d", this->score);
-  } else if (this->level == -5) {
-    this->score = game_info.score;
-    mvprintw(this->y, this->x*2, "%d", this->score);
-  } else if (this->level == -4) {
-    this->score = game_info.level;
-    mvprintw(this->y, this->x*2, "%d", this->score);
+  } else if (this->mode == -3) {
+    this->value = game_info.speed;
+    mvprintw(this->y, this->x*2, "%d", this->value);
+  } else if (this->mode == -2) {
+    this->value = game_info.high_score;
+    mvprintw(this->y, this->x*2, "%d", this->value);
+  } else if (this->mode == -5) {
+    this->value = game_info.score;
+    mvprintw(this->y, this->x*2, "%d", this->value);
+  } else if (this->mode == -4) {
+    this->value = game_info.level;
+    mvprintw(this->y, this->x*2, "%d", this->value);
   } else {
     drawFigure(this, game_info);
   }
@@ -128,9 +126,9 @@ Window_t _constructorWindow(Tetris_t *tetris) {
                  "Press s to start"
         },
         .size = 5,
-        .color = PANEL_GREEN_COLOR,
-        .score = -1,
-        .level = -1,
+        .color = PANEL_COLOR_GREEN,
+        .value = -1,
+        .mode = -1,
         .draw = _drawPanel,
      },
      .nextFigurePanel = (Panel_t) {
@@ -138,9 +136,9 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .y = 1,
         .head_text = "Next fihure:",
         .size = 0,
-        .color = PANEL_BLUE_COLOR,
-        .score = -1,
-        .level = -1,
+        .color = PANEL_COLOR_BLUE,
+        .value = -1,
+        .mode = -1,
         .draw = _drawPanel,
      },
      .scorePanel = (Panel_t) {
@@ -148,29 +146,29 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .y = 8,
         .head_text = "Score:",
         .size = 0,
-        .color = PANEL_GREEN_COLOR,
-        .score = 0,
-        .level = -5,
+        .color = PANEL_COLOR_GREEN,
+        .value = 0,
+        .mode = -5,
         .draw = _drawPanel,
      },
      .high_score_panel = (Panel_t) {
         .x = 20,
         .y = 8,
-        .head_text = "High score:",
+        .head_text = "High value:",
         .size = 0,
-        .color = PANEL_RED_COLOR,
-        .score = 0,
-        .level = -2,
+        .color = PANEL_COLOR_RED,
+        .value = 0,
+        .mode = -2,
         .draw = _drawPanel,
      },
-     .levelPanel = (Panel_t) {
+     .levelPanel= (Panel_t) {
         .x = 15,
         .y = 12,
         .head_text = "Level:",
         .size = 0,
-        .color = PANEL_YELLOW_COLOR,
-        .score = 0,
-        .level = -4,
+        .color = PANEL_COLOR_YELLOW,
+        .value = 0,
+        .mode = -4,
         .draw = _drawPanel,
      },
      .speed_panel = (Panel_t) {
@@ -178,9 +176,9 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .y = 12,
         .head_text = "Speed:",
         .size = 0,
-        .color = PANEL_GREEN_COLOR,
-        .score = 0,
-        .level = -3,
+        .color = PANEL_COLOR_GREEN,
+        .value = 0,
+        .mode = -3,
         .draw = _drawPanel,
      },
 

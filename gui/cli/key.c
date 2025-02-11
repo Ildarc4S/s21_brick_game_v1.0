@@ -1,7 +1,7 @@
-#include "key.h"
+#include "./include/key.h"
 #include <stdlib.h>
 #include <ncurses.h>
-#include "../../brick_game/tetris/include/timer.h"
+#include <sys/time.h>
 
 void _addKeyboardListener(Keyboard_t *kb, int key, void (*listenerFunc)(Button_t btn)) {
   kb->keyboard_listen_list = realloc(kb->keyboard_listen_list, sizeof(KeyboardListener_t)*(kb->size + 1)); 
@@ -61,10 +61,9 @@ void _listen(Keyboard_t *this) {
   }
 }
 
-Keyboard_t *_constructorKeyboard() {
+Keyboard_t *constructorKeyboard() {
   Keyboard_t *new_keyboard = malloc(sizeof(Keyboard_t));
 
-  new_keyboard->constructor = _constructorKeyboard;
   new_keyboard->destructor = _destructorKeyboard;
   new_keyboard->addKeyboardListener = _addKeyboardListener;
   new_keyboard->destroyKeyboardListener = _destructorKeyboard;
@@ -85,7 +84,7 @@ void _destructorKeyboard(Keyboard_t *kb) {
 Keyboard_t* initKeyboard() {
   static Keyboard_t *keyboard = NULL;
   if (!keyboard) {
-    keyboard = _constructorKeyboard();
+    keyboard = constructorKeyboard();
   }
   return keyboard;
 }

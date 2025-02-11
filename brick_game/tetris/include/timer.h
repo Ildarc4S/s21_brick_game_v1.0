@@ -7,14 +7,14 @@ typedef struct _timer {
   struct timeval last_time;
   long tick;
 
-  void (*updateCurrenTime)(struct _timer *_this);
-  void (*updateLastTime)(struct _timer *_this);
-  long (*calcDiff)(struct _timer *_this);
+  void (*updateCurrenTime)(struct _timer *);
+  void (*updateLastTime)(struct _timer *);
+  long (*calcDiff)(struct _timer *);
 
-  long (*getTick)(struct _timer *_this);
-  void (*setTick)(struct _timer *_this, long tick);
+  long (*getTick)(struct _timer *);
+  void (*setTick)(struct _timer *, long);
 } Timer_t;
 
 Timer_t constructorTimer();
 
-#endif  // TIMER_H
+#endif // TIMER_H

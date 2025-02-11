@@ -1,6 +1,6 @@
 #include "./include/data_base.h"
-#include <stdio.h>
 #include <ncurses.h>
+#include <stdio.h>
 
 int _readToFile(DataBase_t *this) {
   int high_score = 0;
@@ -17,15 +17,11 @@ void _writeToFile(DataBase_t *this, int high_score) {
   if (file) {
     fprintf(file, "high_score: %d", high_score);
     fclose(file);
-  } 
+  }
 }
 
 DataBase_t initDatabase(char *file_name) {
-  DataBase_t db = {
-    .read = _readToFile,
-    .write = _writeToFile
-  };
+  DataBase_t db = {.read = _readToFile, .write = _writeToFile};
   sprintf(db.file_name, "%s", file_name);
   return db;
 }
-

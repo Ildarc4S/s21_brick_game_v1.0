@@ -4,9 +4,9 @@
 typedef struct _score {
   int score;
 
-  int (*getScore)(struct _score *_this);
-  void (*setScore)(struct _score *_this, int score);
-  void (*convertLineCountToScore)(struct _score *_this, int line_count);
+  int (*getScore)(struct _score *);
+  void (*setScore)(struct _score *, int);
+  void (*convertLineCountToScore)(struct _score *, int);
 } Score_t;
 
 typedef struct _level {
@@ -14,10 +14,10 @@ typedef struct _level {
   int level;
   int max_level_score;
 
-  int (*getLevel)(struct _level *_this);
-  void (*setLevel)(struct _level *_this, int level);
-  void (*setScore)(struct _level *_this, Score_t *score);
-  void (*updateLevel)(struct _level *_this);
+  int (*getLevel)(struct _level *);
+  void (*setLevel)(struct _level *, int);
+  void (*setScore)(struct _level *, Score_t *);
+  void (*updateLevel)(struct _level *);
 } Level_t;
 
 Level_t constructorLevel();

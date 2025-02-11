@@ -1,7 +1,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include <stdbool.h>
+#include "./frontend.h"
 
 typedef struct _button {
   int key;

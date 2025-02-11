@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "./include/backend.h"
+#include "./include/tetris.h"
 
-void fillField(int** field) {
+void cleanField(int **field) {
   for (int i = 0; i < FIELD_HEIGHT + 2; i++) {
     for (int j = 0; j < FIELD_WIDTH + 2; j++) {
-      if ( i == 0 || j == 0 || i == FIELD_HEIGHT + 1 || j == FIELD_WIDTH + 1) {
+      if (i == 0 || j == 0 || i == FIELD_HEIGHT + 1 || j == FIELD_WIDTH + 1) {
         field[i][j] = 1;
       } else {
         field[i][j] = 0;
@@ -16,9 +16,9 @@ void fillField(int** field) {
   }
 }
 
-int** newField(int width, int height) {
+int **newField(int width, int height) {
   int result_code = 0;
-  int** field = (int **)calloc(height + 2, sizeof(int *));
+  int **field = (int **)calloc(height + 2, sizeof(int *));
   if (field == NULL) {
     result_code = 1;
   }
@@ -36,7 +36,7 @@ int** newField(int width, int height) {
   return field;
 }
 
-void freeField(int** field, int height) {
+void freeField(int **field, int height) {
   if (field == NULL) {
     return;
   }
@@ -45,7 +45,4 @@ void freeField(int** field, int height) {
     field[i] = NULL;
   }
   free(field);
-  field = NULL;
 }
-
-

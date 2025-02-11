@@ -7,15 +7,14 @@ typedef struct _tetramino_collection {
   Tetramino_t *tetraminos;
   int size;
 
-  void (*pushTetramino)(struct _tetramino_collection *_this,
-                        Tetramino_t tetramino);
+  void (*pushTetramino)(struct _tetramino_collection *,
+                        Tetramino_t);
 
-  int (*getSize)(struct _tetramino_collection *_this);
-  int (*setSize)(struct _tetramino_collection *_this, int size);
-  Tetramino_t *(*getRandomTetranimo)(struct _tetramino_collection *_this);
+  int (*getSize)(struct _tetramino_collection *);
+  int (*setSize)(struct _tetramino_collection *, int);
+  Tetramino_t *(*getRandomTetranimo)(struct _tetramino_collection *);
 
-  struct _tetramino_collection *(*constructor)();
-  void (*destructor)(struct _tetramino_collection *_this);
+  void (*destructor)(struct _tetramino_collection *);
 } TetraminoCollection_t;
 
 TetraminoCollection_t *initTetraminoCollection();

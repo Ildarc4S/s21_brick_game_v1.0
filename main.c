@@ -3,8 +3,7 @@
 #include "gui/cli/include/window.h"
 
 #include <unistd.h>
-#include "gui/cli/button.h"
-#include "gui/cli/key.h"
+#include "gui/cli/include/key.h"
 #include <stdlib.h>
 #include <time.h>
 

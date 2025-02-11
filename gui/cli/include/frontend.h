@@ -1,8 +1,10 @@
+#ifndef FRONTEND_H
+#define FRONTEND_H
+
 #include <ncurses.h>
-#include "../../../brick_game/tetris/include/objects.h"
+#include "../../../brick_game/tetris/include/tetris.h"
 
 void initColorPairs();
 void initNcurses();
 
-void printField();
-void printTetramino(Tetramino_t *tetramino);
+#endif  // FRONTEND_H

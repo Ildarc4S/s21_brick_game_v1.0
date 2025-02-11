@@ -1,17 +1,42 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include "./objects.h"
+#include <stdbool.h>
 
-Tetris_t *initTetris();
+typedef enum {
+  Start,
+  Pause,
+  Terminate,
+  Left,
+  Right,
+  Up,
+  Down,
+  Action
+} UserAction_t;
 
-int** newField(int width, int height);
-void freeField(int** field, int height);
+typedef struct {
+  int **field;
+  int **next;
+  int score;
+  int high_score;
+  int level;
+  int speed;
+  int pause;
+} GameInfo_t;
 
-void createBrick(Tetris_t *tetris);
-void fillField(int **field);
+typedef enum {
+  START,
+  SPAWN,
+  MOVE,
+  SHIFT,
+  PAUSE,
+  GAME_OVER,
+  EXIT,
+  ATTACH
+} TetrisState_t;
 
-Tetris_t* createTetris();
-void actionProcess(UserAction_t action, Tetris_t* tetris, int hold);
+void userInput(UserAction_t action, bool hold);
 
-#endif // BACKEND_H
+GameInfo_t updateCurrentState();
+
+#endif  // BACKEND_H
