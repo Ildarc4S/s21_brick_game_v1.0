@@ -4,5 +4,5 @@
 void initColorPairs();
 void initNcurses();
 
-void printField(GameInfo_t *game);
+void printField();
 void printTetramino(Tetramino_t *tetramino);

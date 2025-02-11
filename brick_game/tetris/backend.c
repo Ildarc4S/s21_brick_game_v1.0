@@ -4,7 +4,6 @@
 
 #include "./include/backend.h"
 
-
 void fillField(int** field) {
   for (int i = 0; i < FIELD_HEIGHT + 2; i++) {
     for (int j = 0; j < FIELD_WIDTH + 2; j++) {

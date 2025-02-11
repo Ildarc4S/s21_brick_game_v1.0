@@ -9,8 +9,8 @@
 
 #include <stdbool.h>
 #include "./tetramino_collection.h"
-#include <sys/time.h>
-#include <time.h>
+#include "./timer.h"
+#include "./level_manager.h"
 
 typedef enum {
   Start,
@@ -48,29 +48,33 @@ typedef struct {
   GameInfo_t game_info;
   Tetramino_t *curr_tetramino;
   Tetramino_t *next_tetramino;
-  struct timeval last_time;
 } TetrisInfo_t;
 
-typedef struct _tetris_t {
+typedef struct _tetris {
   TetrisState_t state;
-
   TetrisInfo_t info;
-  TetraminoCollection_t *collection;
 
-  void (*start)(struct _tetris_t* tetris);
-  void (*spawn)(struct _tetris_t* tetris);
-  void (*left)(struct _tetris_t* tetris, bool hold);
-  void (*action)(struct _tetris_t* tetris, bool hold);
-  void (*right)(struct _tetris_t* tetris, bool hold);
-  void (*up)(struct _tetris_t* tetris, bool hold);
-  void (*down)(struct _tetris_t* tetris, bool hold);
-  void (*pause)(struct _tetris_t* tetris);
-  void (*gameOver)(struct _tetris_t* tetris);
-  void (*exit)(struct _tetris_t* tetris);
+  TetraminoCollection_t *collection;
+  Timer_t *timer;
+  Level_t level;
+
+  void (*start)(struct _tetris* tetris);
+  void (*spawn)(struct _tetris* tetris);
+  void (*left)(struct _tetris* tetris, bool hold);
+  void (*action)(struct _tetris* tetris, bool hold);
+  void (*right)(struct _tetris* tetris, bool hold);
+  void (*up)(struct _tetris* tetris, bool hold);
+  void (*down)(struct _tetris* tetris, bool hold);
+  void (*pause)(struct _tetris* tetris);
+  void (*gameOver)(struct _tetris* tetris);
+  void (*exit)(struct _tetris* tetris);
+
+  void (*updateScore)(struct _tetris *_this);
+  void (*updateLevel)(struct _tetris *_this);
 } Tetris_t;
 
 void userInput(UserAction_t action, int hold);
 
 GameInfo_t updateCurrentState();
 
-#endif // OBJECTS_H
+#endif  // OBJECTS_H

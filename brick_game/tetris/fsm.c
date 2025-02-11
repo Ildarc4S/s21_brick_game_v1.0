@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include "./include/timer.h"
+
 
 Tetris_t* createTetris();
 void actionProcess(UserAction_t action, Tetris_t* tetris, int hold);
@@ -130,7 +132,7 @@ void rotateTetramino(Tetramino_t* tetramino) {
 }
 
 
-void _startGame(struct _tetris_t *tetris) { 
+void _startGame(Tetris_t *tetris) { 
   tetris->state = SPAWN;
   tetris->spawn(tetris);
 }
@@ -147,9 +149,10 @@ void _spawn(Tetris_t *this) {
   this->info.curr_tetramino->y = 1;
   
   this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
-
+  
   for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
     for (int j = 0;  j < TETRAMINO_WIDTH; j++) {
+      this->info.game_info.next[i][j] = 0;
       if (this->info.next_tetramino->brick[i][j]) {
         this->info.game_info.next[i][j] = this->info.next_tetramino->color;
       }
@@ -165,15 +168,15 @@ void _spawn(Tetris_t *this) {
 
 }
 
-void _pauseGame(struct _tetris_t *tetris) { 
+void _pauseGame(Tetris_t *tetris) { 
   tetris->state = PAUSE;
 }
 
-void _exitGame(struct _tetris_t *tetris) { 
+void _exitGame(Tetris_t *tetris) { 
   tetris->state = EXIT;
 }
 
-void _left(struct _tetris_t *tetris, bool hold) {
+void _left(Tetris_t *tetris, bool hold) {
   if (!tetris) return;
   (void)hold;
   
@@ -317,17 +320,7 @@ void userInput(UserAction_t action, int hold) {
            break;
        };
        break;
-     case SPAWN:
-       switch (action) {
-         case Terminate:
-           tetris->exit(tetris);
-           break;
-
-         default:
-           break;
-       };
      case MOVE: 
-     case SHIFT: 
        switch (action) {
          case Terminate:
            tetris->exit(tetris);
@@ -402,13 +395,22 @@ void createBrick(Tetris_t *tetris) {
   }
 }
 
+void _updateTetrisScore(Tetris_t *this) {
+  this->info.game_info.score = this->level.score.getScore(&this->level.score);
+}
+
+void _updateTetrisLevel(Tetris_t *this) {
+  this->info.game_info.level = this->level.getLevel(&this->level);
+}
+
 Tetris_t* createTetris() {
   Tetris_t *tetris_self = (Tetris_t*)malloc(sizeof(Tetris_t));
-  
+  if (!tetris_self) return NULL; // Проверка на успешное выделение памяти
+
   tetris_self->state = START;
-  tetris_self->info = (TetrisInfo_t) {
-    .game_info = (GameInfo_t) { 
-      .field = newField(FIELD_WIDTH + 2,FIELD_HEIGHT + 2),
+  tetris_self->info = (TetrisInfo_t) { 
+    .game_info = {  
+      .field = newField(FIELD_WIDTH + 2, FIELD_HEIGHT + 2),
       .next = newField(TETRAMINO_WIDTH, TETRAMINO_HEIGHT),
       .score = 0,
       .high_score = 0,
@@ -416,10 +418,12 @@ Tetris_t* createTetris() {
       .speed = 0,
       .pause = 0
     },
-    .last_time = 0,
     .curr_tetramino = NULL,
     .next_tetramino = NULL
   };
+
+  tetris_self->level = constructorLevel();
+  tetris_self->timer = initTimer(),
   tetris_self->left = _left; 
   tetris_self->right = _right; 
   tetris_self->down = _down; 
@@ -429,10 +433,15 @@ Tetris_t* createTetris() {
   tetris_self->spawn = _spawn;
   tetris_self->exit = _exitGame; 
   tetris_self->pause = _pauseGame; 
+
+  tetris_self->updateLevel = _updateTetrisLevel;
+  tetris_self->updateScore = _updateTetrisScore;
+
   tetris_self->collection = initTetraminoCollection();
 
   return tetris_self;
 }
+
 
 Tetris_t *initTetris() {
   static Tetris_t *tetris = NULL;
@@ -447,17 +456,50 @@ long timeDiff(struct timeval start, struct timeval end) {
          (end.tv_usec - start.tv_usec) / 1000;
 }
 
+void shiftLines(int *i, Tetris_t *this) {
+  for (int k = *i; k > 1; k--) {
+    for (int j = 1; j <= FIELD_WIDTH; j++) {
+      this->info.game_info.field[k][j] = this->info.game_info.field[k - 1][j];
+    }
+  }
+  *i += 1; 
+}
+
+void cleanLines(Tetris_t *this) {
+  int erase_line_count = 0;
+  for (int i = FIELD_HEIGHT; i > 0; i--) {
+    int erase_line = 1;
+    for (int j = 1; j < FIELD_WIDTH + 1; j++) {
+      if (this->info.game_info.field[i][j] == 0) {
+        erase_line = 0;
+      }
+    }
+    if (erase_line) {
+      erase_line_count++;
+      shiftLines(&i, this);
+    }
+  }
+
+  Score_t score = constructorScore();
+  score.convertLineCountToScore(&score, erase_line_count);
+
+  this->level.setScore(&this->level, &score);
+  this->level.updateLevel(&this->level);
+
+  this->updateScore(this);
+  this->updateLevel(this);
+}
+
 GameInfo_t updateCurrentState() {
   Tetris_t *tetris = initTetris();
   if (tetris->state == MOVE) {
-    struct timeval current_time;
-    gettimeofday(&current_time, NULL);  
-    if (timeDiff(tetris->info.last_time, current_time) >= 1010) {
+    if (tetris->timer->calcDiff(tetris->timer) >= tetris->timer->getTick(tetris->timer)) {
       tetris->down(tetris, 0);
-      tetris->info.last_time = current_time;  // Обновление времени последнего вызова
+      tetris->timer->updateLastTime(tetris->timer);
     }
   } else if (tetris->state == ATTACH) {
     tetris->spawn(tetris);
+    cleanLines(tetris);
   }
   return tetris->info.game_info;
 }

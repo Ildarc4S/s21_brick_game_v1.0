@@ -1,5 +1,7 @@
 #include "brick_game/tetris/include/backend.h"
 #include "gui/cli/include/frontend.h"
+#include "gui/cli/include/window.h"
+
 #include <unistd.h>
 #include "gui/cli/button.h"
 #include "gui/cli/key.h"
@@ -55,14 +57,15 @@ void gameLoop() {
   Keyboard_t *kb = initKeyboard();
   initKeyboardHandlers();
   fillField(tetris->info.game_info.field);
-
+  Window_t window = _constructorWindow();
   timeout(0);
   while (tetris->state != EXIT) {
     redrawwin(stdscr); // Перерисовываем без очистки экрана
     kb->listen(kb);      
-
-    printField(&tetris->info.game_info);
+    window.draw(&window);
+    printField();
     printTetramino(tetris->info.curr_tetramino);
+
     mvprintw(20, 40, "%d", tetris->state);
     wnoutrefresh(stdscr); // Подготавливаем изменения
     doupdate();           // Выводим их одним кадром
