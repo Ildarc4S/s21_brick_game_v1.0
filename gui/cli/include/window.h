@@ -45,6 +45,7 @@ typedef struct _window {
   Panel_t high_score_panel;
   Panel_t levelPanel;
   Panel_t helpPanel;
+  Panel_t speed_panel;
   GameField_t game_field;
 
   void (*draw)(struct _window *_this);

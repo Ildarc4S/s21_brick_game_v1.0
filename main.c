@@ -58,17 +58,15 @@ void gameLoop() {
   initKeyboardHandlers();
   Window_t window = _constructorWindow(tetris);
 
-  timeout(500);
+  timeout(300);
   while (tetris->state != EXIT) {
     redrawwin(stdscr); // Перерисовываем без очистки экрана
+                       
     kb->listen(kb);      
     window.draw(&window);
 
-    mvprintw(20, 40, "%d", tetris->state);
     wnoutrefresh(stdscr); // Подготавливаем изменения
     doupdate();           // Выводим их одним кадром
-
-  //  usleep(50000); // Ждём 30 мс (уменьшает нагрузку и мигание)
   }
 }
 

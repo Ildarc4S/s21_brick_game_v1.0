@@ -40,7 +40,7 @@ Timer_t constructorTimer() {
     .getTick = _getTimerTick,
     .setTick = _setTimerTick,
 
-    .tick = 1500
+    .tick = 1000
   };
 }
 

@@ -26,20 +26,24 @@ void drawFigure(Panel_t *this, GameInfo_t game_info) {
 void _drawPanel(Panel_t *this) {
   GameInfo_t game_info = updateCurrentState(); 
   _drawPanelHead(this);
-
+ 
+  mvprintw(this->y, (this->x)*2, "       ");  // Clean Field
   if (this->size != 0) {
     for (int i = 0; i < this->size; i++) {
       mvprintw(this->y+i, this->x*2, "%s", this->text[i]);
     }
+  } else if (this->level == -3) {
+    this->score = game_info.speed;
+    mvprintw(this->y, this->x*2, "%d", this->score);
   } else if (this->level == -2) {
     this->score = game_info.high_score;
     mvprintw(this->y, this->x*2, "%d", this->score);
-  } else if (this->score != -1) {
+  } else if (this->level == -5) {
     this->score = game_info.score;
     mvprintw(this->y, this->x*2, "%d", this->score);
-  } else if (this->level != -1) {
-    this->level = game_info.level;
-    mvprintw(this->y, this->x*2, "%d", this->level);
+  } else if (this->level == -4) {
+    this->score = game_info.level;
+    mvprintw(this->y, this->x*2, "%d", this->score);
   } else {
     drawFigure(this, game_info);
   }
@@ -54,6 +58,7 @@ void _drawWindow(Window_t *this) {
   this->high_score_panel.draw(&this->high_score_panel);
   this->levelPanel.draw(&this->levelPanel);
   this->nextFigurePanel.draw(&this->nextFigurePanel);
+  this->speed_panel.draw(&this->speed_panel);
 }
 
 void drawCleanField(GameField_t *this) {
@@ -113,22 +118,23 @@ void _drawTetramino(GameField_t *this) {
 Window_t _constructorWindow(Tetris_t *tetris) {
    return (Window_t) {
      .helpPanel = (Panel_t) {
-        .x = 20,
-        .y = 1,
+        .x = 15,
+        .y = 16,
         .head_text = "Help:",
         .text = {"Press q to quit",
                  "Press p to pause",
-                 "Press left/right/down to move figure",
+                 "Press left/right to move figure",
+                 "Press double down to move figure down",
                  "Press s to start"
         },
-        .size = 4,
+        .size = 5,
         .color = PANEL_GREEN_COLOR,
         .score = -1,
         .level = -1,
         .draw = _drawPanel,
      },
      .nextFigurePanel = (Panel_t) {
-        .x = 50,
+        .x = 15,
         .y = 1,
         .head_text = "Next fihure:",
         .size = 0,
@@ -138,19 +144,19 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .draw = _drawPanel,
      },
      .scorePanel = (Panel_t) {
-        .x = 50,
-        .y = 10,
+        .x = 15,
+        .y = 8,
         .head_text = "Score:",
         .size = 0,
         .color = PANEL_GREEN_COLOR,
         .score = 0,
-        .level = -1,
+        .level = -5,
         .draw = _drawPanel,
      },
      .high_score_panel = (Panel_t) {
-        .x = 50,
-        .y = 30,
-        .head_text = "Score:",
+        .x = 20,
+        .y = 8,
+        .head_text = "High score:",
         .size = 0,
         .color = PANEL_RED_COLOR,
         .score = 0,
@@ -158,15 +164,26 @@ Window_t _constructorWindow(Tetris_t *tetris) {
         .draw = _drawPanel,
      },
      .levelPanel = (Panel_t) {
-        .x = 50,
-        .y = 20,
+        .x = 15,
+        .y = 12,
         .head_text = "Level:",
         .size = 0,
         .color = PANEL_YELLOW_COLOR,
-        .score = -1,
-        .level = 0,
+        .score = 0,
+        .level = -4,
         .draw = _drawPanel,
      },
+     .speed_panel = (Panel_t) {
+        .x = 20,
+        .y = 12,
+        .head_text = "Speed:",
+        .size = 0,
+        .color = PANEL_GREEN_COLOR,
+        .score = 0,
+        .level = -3,
+        .draw = _drawPanel,
+     },
+
      .game_field = (GameField_t) {
        .x = 0,
        .y = 0,

@@ -135,24 +135,28 @@ void rotateTetramino(Tetramino_t* tetramino) {
 void _startGame(Tetris_t *tetris) { 
   if (tetris->state == START) {
     tetris->info.game_info.pause = 0;
-    tetris->state = SPAWN;
     tetris->spawn(tetris);
     tetris->info.game_info.high_score = tetris->db.read(&tetris->db);
   } else if (tetris->state == PAUSE) {
     tetris->info.game_info.pause = 0;
     tetris->state = MOVE;
   } else if (tetris->state == GAME_OVER) {
-    tetris->info.game_info.pause = 0;
-    tetris->state = SPAWN;
     fillField(tetris->info.game_info.field);
+
+    tetris->timer.tick = 1000;
+    tetris->level.level = 1;
+    tetris->level.score.score = 0;
+
+    tetris->info.game_info.level = 1;
+    tetris->info.game_info.score = 1;
+    tetris->info.game_info.pause = 0;
+    tetris->info.game_info.speed = 10;
     tetris->spawn(tetris);
   }
-  mvprintw(40, 30, "PAUSE: %d, STATE: %d", tetris->info.game_info.pause, tetris->state);
 }
 
 void _spawn(Tetris_t *this) {
   if (!this) return;
-
 
   if (!this->info.next_tetramino) {
     this->info.next_tetramino = this->collection->getRandomTetranimo(this->collection);
@@ -228,7 +232,7 @@ void _down(Tetris_t *tetris, bool hold) {
   Tetramino_t *tetramino = tetris->info.curr_tetramino; 
   int is_collide = 0;
   
-  if (!hold) {
+  if (hold == 0) {
     tetramino->y++;
     if (isCollide(tetris, tetramino)) {
       is_collide = 1;
@@ -246,73 +250,6 @@ void _down(Tetris_t *tetris, bool hold) {
     tetris->state = ATTACH;
     insertBrick(tetris);
     tetris->info.curr_tetramino = NULL;
-  }
-}
-void computeCollisionSides(Tetris_t *tetris, Tetramino_t *tetramino, 
-                           int *collide_left_x, int *collide_right_x, 
-                           int *collide_top_y, int *collide_bottom_y) {
-  if (!tetris || !tetramino) return;
-
-  // Сбрасываем флаги столкновения
-  *collide_left_x = *collide_right_x = *collide_top_y = *collide_bottom_y = -1;
-
-  int min_x, max_x, min_y, max_y;
-  
-  // Получаем реальные размеры фигуры
-  getRealBrickSize(tetramino, &min_x, &max_x, &max_y);
-  min_x += tetramino->x;
-  max_x += tetramino->x;
-  max_y += tetramino->y;
-  min_y = tetramino->y; // Верхняя граница фигуры (минимальный Y)
-
-  int **matrix = tetris->info.game_info.field; // Игровое поле
-
-  // Проверка столкновения с левой стенкой
-  if (min_x < 0) {
-    *collide_left_x = min_x;
-  } else {
-    for (int y = min_y; y <= max_y; y++) {
-      if (matrix[y][min_x] != 0) { // Если клетка занята
-        *collide_left_x = min_x;
-        break;
-      }
-    }
-  }
-
-  // Проверка столкновения с правой стенкой
-  if (max_x >= FIELD_WIDTH) {
-    *collide_right_x = max_x;
-  } else {
-    for (int y = min_y; y <= max_y; y++) {
-      if (matrix[y][max_x] != 0) {
-        *collide_right_x = max_x;
-        break;
-      }
-    }
-  }
-
-  // Проверка столкновения с нижней границей
-  if (max_y >= FIELD_HEIGHT) {
-    *collide_bottom_y = max_y;
-  } else {
-    for (int x = min_x; x <= max_x; x++) {
-      if (matrix[max_y][x] != 0) {
-        *collide_bottom_y = max_y;
-        break;
-      }
-    }
-  }
-
-  // Проверка столкновения с верхней границей (например, при появлении)
-  if (min_y < 0) {
-    *collide_top_y = min_y;
-  } else {
-    for (int x = min_x; x <= max_x; x++) {
-      if (matrix[min_y][x] != 0) {
-        *collide_top_y = min_y;
-        break;
-      }
-    }
   }
 }
 
@@ -408,17 +345,6 @@ void userInput(UserAction_t action, bool hold) {
    };
 }
 
-void createBrick(Tetris_t *tetris) {
-  int r[4][4] = {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-  tetris->info.curr_tetramino = malloc(sizeof(Tetramino_t));
-  
-  for (int i = 0; i < TETRAMINO_HEIGHT; i++) {
-    for (int j = 0; j < TETRAMINO_WIDTH; j++) {
-      tetris->info.curr_tetramino->brick[i][j] = r[i][j];
-    }
-  }
-}
-
 void _updateTetrisScore(Tetris_t *this) {
   this->info.game_info.score = this->level.score.getScore(&this->level.score);
   if (this->info.game_info.score >= this->info.game_info.high_score) {
@@ -427,6 +353,11 @@ void _updateTetrisScore(Tetris_t *this) {
 }
 
 void _updateTetrisLevel(Tetris_t *this) {
+  long tick = this->timer.getTick(&this->timer);
+  if (this->level.getLevel(&this->level) > this->info.game_info.level && tick >= 80) {
+    this->info.game_info.speed += 10;
+    this->timer.setTick(&this->timer, tick-70); 
+  }
   this->info.game_info.level = this->level.getLevel(&this->level);
 }
 
