@@ -17,11 +17,11 @@ void _setLevel(Level_t *this, int level) {
 }
 
 void _convertLineCountToscore(Score_t *this, int line_count) {
-  int convert_score[5] = {100, 300, 500, 700, 900};
-  if (line_count < 5 && line_count > 0) { 
+  int convert_score[4] = {100, 300, 700, 1500};
+  if (line_count < 4 && line_count > 0) { 
     this->score += convert_score[line_count - 1];
-  } else if (line_count >= 5) {
-    this->score += convert_score[4];
+  } else if (line_count >= 4) {
+    this->score += convert_score[3];
   }
 }
 
@@ -48,7 +48,7 @@ Score_t constructorScore() {
 Level_t constructorLevel() {
   return (Level_t) {
     .level = 0,
-    .max_level_score = 500,
+    .max_level_score = 600,
     .score = constructorScore(),
     .getLevel = _getLevel,
     .setLevel = _setLevel,
