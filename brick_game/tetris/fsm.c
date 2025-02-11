@@ -133,8 +133,20 @@ void rotateTetramino(Tetramino_t* tetramino) {
 
 
 void _startGame(Tetris_t *tetris) { 
-  tetris->state = SPAWN;
-  tetris->spawn(tetris);
+  if (tetris->state == START) {
+    tetris->info.game_info.pause = 0;
+    tetris->state = SPAWN;
+    tetris->spawn(tetris);
+  } else if (tetris->state == PAUSE) {
+    tetris->info.game_info.pause = 0;
+    tetris->state = MOVE;
+  } else if (tetris->state == GAME_OVER) {
+    tetris->info.game_info.pause = 0;
+    tetris->state = SPAWN;
+    fillField(tetris->info.game_info.field);
+    tetris->spawn(tetris);
+  }
+  mvprintw(40, 30, "PAUSE: %d, STATE: %d", tetris->info.game_info.pause, tetris->state);
 }
 
 void _spawn(Tetris_t *this) {
@@ -162,13 +174,14 @@ void _spawn(Tetris_t *this) {
   this->state = MOVE;
 
   if (checkCollideOtherBreak(this, this->info.curr_tetramino)) {
-    mvprintw(21, 40, "Game over");
+    this->info.game_info.pause = -1;
     this->state = GAME_OVER; 
   }
 
 }
 
 void _pauseGame(Tetris_t *tetris) { 
+  tetris->info.game_info.pause = 1;
   tetris->state = PAUSE;
 }
 
@@ -365,7 +378,6 @@ void userInput(UserAction_t action, int hold) {
        };
        break;
     case GAME_OVER: 
-       mvprintw(19, 40, "State");
        switch (action) {
          case Start:
            tetris->start(tetris);
@@ -416,11 +428,12 @@ Tetris_t* createTetris() {
       .high_score = 0,
       .level = 1,
       .speed = 0,
-      .pause = 0
+      .pause = 2
     },
     .curr_tetramino = NULL,
     .next_tetramino = NULL
   };
+  fillField(tetris_self->info.game_info.field);
 
   tetris_self->level = constructorLevel();
   tetris_self->timer = initTimer(),
@@ -442,6 +455,10 @@ Tetris_t* createTetris() {
   return tetris_self;
 }
 
+// -1 - GAME_OVER
+// 0 - MOVE
+// 1 - PAUSE 
+// 2 - start
 
 Tetris_t *initTetris() {
   static Tetris_t *tetris = NULL;

@@ -9,6 +9,8 @@ void fillField(int** field) {
     for (int j = 0; j < FIELD_WIDTH + 2; j++) {
       if ( i == 0 || j == 0 || i == FIELD_HEIGHT + 1 || j == FIELD_WIDTH + 1) {
         field[i][j] = 1;
+      } else {
+        field[i][j] = 0;
       }
     }
   }

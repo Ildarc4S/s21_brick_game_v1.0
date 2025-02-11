@@ -56,15 +56,13 @@ void gameLoop() {
   Tetris_t *tetris = initTetris();
   Keyboard_t *kb = initKeyboard();
   initKeyboardHandlers();
-  fillField(tetris->info.game_info.field);
-  Window_t window = _constructorWindow();
+  Window_t window = _constructorWindow(tetris);
+
   timeout(0);
   while (tetris->state != EXIT) {
     redrawwin(stdscr); // Перерисовываем без очистки экрана
     kb->listen(kb);      
     window.draw(&window);
-    printField();
-    printTetramino(tetris->info.curr_tetramino);
 
     mvprintw(20, 40, "%d", tetris->state);
     wnoutrefresh(stdscr); // Подготавливаем изменения

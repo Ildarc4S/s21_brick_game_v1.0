@@ -41,13 +41,69 @@ void _drawPanel(Panel_t *this) {
 }
 
 void _drawWindow(Window_t *this) {
+  this->game_field.drawField(&this->game_field);
+  this->game_field.drawTetramino(&this->game_field);
   this->helpPanel.draw(&this->helpPanel);
   this->scorePanel.draw(&this->scorePanel);
   this->levelPanel.draw(&this->levelPanel);
   this->nextFigurePanel.draw(&this->nextFigurePanel);
 }
 
-Window_t _constructorWindow() {
+void drawCleanField(GameField_t *this) {
+  for (int i = 0; i < this->height; i++) {
+    for (int j = 0; j < this->width; j++) {
+      if (i == this->height-1 || j == this->width-1 || i == 0 || j == 0 ) {
+        mvprintw(this->y + i, (this->x + j)*2, "[]");
+      } else {
+        mvprintw(this->y + i, (this->x + j)*2, "  ");
+      }
+    }
+  }
+}
+
+void _drawField(GameField_t *this) {
+  GameInfo_t game = updateCurrentState();
+  if (game.pause == 0) {
+    for (int i = 0; i < this->height; i++) {
+      for (int j = 0; j < this->width; j++) {
+        if (game.field[i][j]) {
+          mvprintw(this->y + i, (this->x + j)*2, "[]");
+        } else {
+          mvprintw(this->y + i, (this->x + j)*2, "  ");
+        }
+      }
+    }
+  } else if (game.pause == 2) {
+    drawCleanField(this);
+    mvprintw(this->height/2, ((this->width-1)/2)*2, "START");
+  } else if (game.pause == 1) {
+    drawCleanField(this);
+    mvprintw(this->height/2, ((this->width-1)/2)*2, "PAUSE");
+  } else if (game.pause == -1) {
+    drawCleanField(this);
+    mvprintw(this->height/2, ((this->width-1)/2)*2, "GAME_OVER");
+  }
+
+}
+
+void _drawTetramino(GameField_t *this) {
+  Tetramino_t *tetramino = this->tetris->info.curr_tetramino;
+  if (!tetramino) return;
+  if (this->tetris->info.game_info.pause != 0) return;
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (tetramino->brick[i][j]) {
+        attron(COLOR_PAIR(tetramino->color));
+        mvprintw(tetramino->y + i, (tetramino->x + j) * 2, "[]");
+        attroff(COLOR_PAIR(tetramino->color));
+      }
+    }
+  }
+}
+
+
+Window_t _constructorWindow(Tetris_t *tetris) {
    return (Window_t) {
      .helpPanel = (Panel_t) {
         .x = 20,
@@ -93,6 +149,15 @@ Window_t _constructorWindow() {
         .score = -1,
         .level = 0,
         .draw = _drawPanel,
+     },
+     .game_field = (GameField_t) {
+       .x = 0,
+       .y = 0,
+       .width = FIELD_WIDTH + 2,
+       .height = FIELD_HEIGHT + 2,
+       .tetris = tetris,
+       .drawField = _drawField,
+       .drawTetramino = _drawTetramino,
      },
      .draw = _drawWindow
    }; 
