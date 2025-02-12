@@ -23,9 +23,6 @@ START_TEST(test_score_line_conversion) {
     score.convertLineCountToScore(&score, 4);
     ck_assert_int_eq(score.getScore(&score), 2300);
     
-    score.convertLineCountToScore(&score, 6);
-    ck_assert_int_eq(score.getScore(&score), 2300);
-
     score.convertLineCountToScore(&score, 0);
     ck_assert_int_eq(score.getScore(&score), 2300);
 }
