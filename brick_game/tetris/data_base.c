@@ -2,6 +2,8 @@
 #include <ncurses.h>
 #include <stdio.h>
 
+
+
 int _readToFile(DataBase_t *this) {
   int high_score = 0;
   FILE *file = fopen(this->file_name, "r");
