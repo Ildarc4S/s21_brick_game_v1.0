@@ -8,7 +8,7 @@ int _getLevel(Level_t *this) { return this->level; }
 
 void _setLevel(Level_t *this, int level) { this->level = level; }
 
-void _convertLineCountToscore(Score_t *this, int line_count) {
+void _convertLineCountToScore(Score_t *this, int line_count) {
   const int convert_score[4] = {100, 300, 700, 1500};
   if (line_count < 4 && line_count > 0) {
     this->score += convert_score[line_count - 1];
@@ -34,7 +34,7 @@ Score_t constructorScore() {
       .score = 0,
       .getScore = _getScore,
       .setScore = _setScore,
-      .convertLineCountToScore = _convertLineCountToscore,
+      .convertLineCountToScore = _convertLineCountToScore,
   };
 }
 
