@@ -1,8 +1,9 @@
 #include "tests.h"
-#include <check.h>
-#include <stdio.h>
 #include "./../brick_game/tetris/include/tetris.h"
 #include "./../brick_game/tetris/include/tetris_utils.h"
+
+#include <check.h>
+#include <unistd.h>
 
 START_TEST(test_tetris_initialization) {
     Tetris_t* tetris = initTetris();
@@ -21,6 +22,28 @@ START_TEST(test_tetris_initialization) {
     tetris->destructor(tetris);
 }
 END_TEST
+
+START_TEST(test_tetris_update_state) {
+    Tetris_t* tetris = initTetris();
+    
+    tetris->start(tetris);
+    tetris->state = MOVE;
+    int tetramino_y = tetris->info.curr_tetramino->y; 
+    sleep(1);
+    GameInfo_t update_one = updateCurrentState();
+
+    ck_assert_int_eq(tetramino_y + 1, tetris->info.curr_tetramino->y); 
+
+    tetris->state = ATTACH;
+    int score = tetris->info.game_info.score;
+    GameInfo_t update_two = updateCurrentState();
+    
+    ck_assert_int_eq(score, tetris->info.game_info.score);
+
+    tetris->destructor(tetris);
+}
+END_TEST
+
 
 START_TEST(test_spawn_and_collision_detection) {
     Tetris_t* tetris = initTetris();
@@ -175,10 +198,11 @@ START_TEST(test_level_progression) {
 END_TEST
 
 Suite* tetris_suite(void) {
-    Suite* s = suite_create("Tetris");
+    Suite* s = suite_create("Tetris Logic");
     TCase* tc_core = tcase_create("Core");
     
     tcase_add_test(tc_core, test_tetris_initialization);
+    tcase_add_test(tc_core, test_tetris_update_state);
     tcase_add_test(tc_core, test_spawn_and_collision_detection);
     tcase_add_test(tc_core, test_movement_and_collision);
     tcase_add_test(tc_core, test_rotation_logic);

@@ -2,13 +2,14 @@
 
 void _drawPanelHead(Panel_t *this) {
   attron(COLOR_PAIR(this->color));
-  mvprintw(this->y - 1, (this->x)*2, "%s", this->head_text);
+  mvprintw(this->y - 1, (this->x) * 2, "%s", this->head_text);
   attroff(COLOR_PAIR(this->color));
 }
 
 void drawFigure(Panel_t *this, GameInfo_t game_info) {
-  if (!this || !game_info.next) return;
-  
+  if (!this || !game_info.next)
+    return;
+
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       mvprintw(this->y + i + 1, (this->x + j + 1) * 2, "  ");
@@ -19,29 +20,29 @@ void drawFigure(Panel_t *this, GameInfo_t game_info) {
       }
     }
   }
-} 
+}
 
 void _drawPanel(Panel_t *this) {
-  GameInfo_t game_info = updateCurrentState(); 
+  GameInfo_t game_info = updateCurrentState();
   _drawPanelHead(this);
- 
-  mvprintw(this->y, (this->x)*2, "       ");  // Clean Field
+
+  mvprintw(this->y, (this->x) * 2, "       "); // Clean Field
   if (this->size != 0) {
     for (int i = 0; i < this->size; i++) {
-      mvprintw(this->y+i, this->x*2, "%s", this->text[i]);
+      mvprintw(this->y + i, this->x * 2, "%s", this->text[i]);
     }
   } else if (this->mode == -3) {
     this->value = game_info.speed;
-    mvprintw(this->y, this->x*2, "%d", this->value);
+    mvprintw(this->y, this->x * 2, "%d", this->value);
   } else if (this->mode == -2) {
     this->value = game_info.high_score;
-    mvprintw(this->y, this->x*2, "%d", this->value);
+    mvprintw(this->y, this->x * 2, "%d", this->value);
   } else if (this->mode == -5) {
     this->value = game_info.score;
-    mvprintw(this->y, this->x*2, "%d", this->value);
+    mvprintw(this->y, this->x * 2, "%d", this->value);
   } else if (this->mode == -4) {
     this->value = game_info.level;
-    mvprintw(this->y, this->x*2, "%d", this->value);
+    mvprintw(this->y, this->x * 2, "%d", this->value);
   } else {
     drawFigure(this, game_info);
   }
@@ -62,10 +63,10 @@ void _drawWindow(Window_t *this) {
 void drawCleanField(GameField_t *this) {
   for (int i = 0; i < this->height; i++) {
     for (int j = 0; j < this->width; j++) {
-      if (i == this->height-1 || j == this->width-1 || i == 0 || j == 0 ) {
-        mvprintw(this->y + i, (this->x + j)*2, "[]");
+      if (i == this->height - 1 || j == this->width - 1 || i == 0 || j == 0) {
+        mvprintw(this->y + i, (this->x + j) * 2, "[]");
       } else {
-        mvprintw(this->y + i, (this->x + j)*2, "  ");
+        mvprintw(this->y + i, (this->x + j) * 2, "  ");
       }
     }
   }
@@ -77,29 +78,30 @@ void _drawField(GameField_t *this) {
     for (int i = 0; i < this->height; i++) {
       for (int j = 0; j < this->width; j++) {
         if (game.field[i][j]) {
-          mvprintw(this->y + i, (this->x + j)*2, "[]");
+          mvprintw(this->y + i, (this->x + j) * 2, "[]");
         } else {
-          mvprintw(this->y + i, (this->x + j)*2, "  ");
+          mvprintw(this->y + i, (this->x + j) * 2, "  ");
         }
       }
     }
   } else if (game.pause == 2) {
     drawCleanField(this);
-    mvprintw(this->height/2, ((this->width-1)/2)*2, "START");
+    mvprintw(this->height / 2, ((this->width - 1) / 2) * 2, "START");
   } else if (game.pause == 1) {
     drawCleanField(this);
-    mvprintw(this->height/2, ((this->width-1)/2)*2, "PAUSE");
+    mvprintw(this->height / 2, ((this->width - 1) / 2) * 2, "PAUSE");
   } else if (game.pause == -1) {
     drawCleanField(this);
-    mvprintw(this->height/2, ((this->width-1)/2)*2, "GAME_OVER");
+    mvprintw(this->height / 2, ((this->width - 1) / 2) * 2, "GAME_OVER");
   }
-
 }
 
 void _drawTetramino(GameField_t *this) {
   Tetramino_t *tetramino = this->tetris->info.curr_tetramino;
-  if (!tetramino) return;
-  if (this->tetris->info.game_info.pause != 0) return;
+  if (!tetramino)
+    return;
+  if (this->tetris->info.game_info.pause != 0)
+    return;
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -112,87 +114,87 @@ void _drawTetramino(GameField_t *this) {
   }
 }
 
-
 Window_t _constructorWindow(Tetris_t *tetris) {
-   return (Window_t) {
-     .helpPanel = (Panel_t) {
-        .x = 15,
-        .y = 16,
-        .head_text = "Help:",
-        .text = {"Press q to quit",
-                 "Press p to pause",
-                 "Press left/right to move figure",
-                 "Press double down to move figure down",
-                 "Press s to start"
-        },
-        .size = 5,
-        .color = PANEL_COLOR_GREEN,
-        .value = -1,
-        .mode = -1,
-        .draw = _drawPanel,
-     },
-     .nextFigurePanel = (Panel_t) {
-        .x = 15,
-        .y = 1,
-        .head_text = "Next fihure:",
-        .size = 0,
-        .color = PANEL_COLOR_BLUE,
-        .value = -1,
-        .mode = -1,
-        .draw = _drawPanel,
-     },
-     .scorePanel = (Panel_t) {
-        .x = 15,
-        .y = 8,
-        .head_text = "Score:",
-        .size = 0,
-        .color = PANEL_COLOR_GREEN,
-        .value = 0,
-        .mode = -5,
-        .draw = _drawPanel,
-     },
-     .high_score_panel = (Panel_t) {
-        .x = 20,
-        .y = 8,
-        .head_text = "High value:",
-        .size = 0,
-        .color = PANEL_COLOR_RED,
-        .value = 0,
-        .mode = -2,
-        .draw = _drawPanel,
-     },
-     .levelPanel= (Panel_t) {
-        .x = 15,
-        .y = 12,
-        .head_text = "Level:",
-        .size = 0,
-        .color = PANEL_COLOR_YELLOW,
-        .value = 0,
-        .mode = -4,
-        .draw = _drawPanel,
-     },
-     .speed_panel = (Panel_t) {
-        .x = 20,
-        .y = 12,
-        .head_text = "Speed:",
-        .size = 0,
-        .color = PANEL_COLOR_GREEN,
-        .value = 0,
-        .mode = -3,
-        .draw = _drawPanel,
-     },
+  return (Window_t){.helpPanel =
+                        (Panel_t){
+                            .x = 15,
+                            .y = 16,
+                            .head_text = "Help:",
+                            .text = {"Press q to quit", "Press p to pause",
+                                     "Press left/right to move figure",
+                                     "Press double down to move figure down",
+                                     "Press s to start"},
+                            .size = 5,
+                            .color = PANEL_COLOR_GREEN,
+                            .value = -1,
+                            .mode = -1,
+                            .draw = _drawPanel,
+                        },
+                    .nextFigurePanel =
+                        (Panel_t){
+                            .x = 15,
+                            .y = 1,
+                            .head_text = "Next fihure:",
+                            .size = 0,
+                            .color = PANEL_COLOR_BLUE,
+                            .value = -1,
+                            .mode = -1,
+                            .draw = _drawPanel,
+                        },
+                    .scorePanel =
+                        (Panel_t){
+                            .x = 15,
+                            .y = 8,
+                            .head_text = "Score:",
+                            .size = 0,
+                            .color = PANEL_COLOR_GREEN,
+                            .value = 0,
+                            .mode = -5,
+                            .draw = _drawPanel,
+                        },
+                    .high_score_panel =
+                        (Panel_t){
+                            .x = 20,
+                            .y = 8,
+                            .head_text = "High value:",
+                            .size = 0,
+                            .color = PANEL_COLOR_RED,
+                            .value = 0,
+                            .mode = -2,
+                            .draw = _drawPanel,
+                        },
+                    .levelPanel =
+                        (Panel_t){
+                            .x = 15,
+                            .y = 12,
+                            .head_text = "Level:",
+                            .size = 0,
+                            .color = PANEL_COLOR_YELLOW,
+                            .value = 0,
+                            .mode = -4,
+                            .draw = _drawPanel,
+                        },
+                    .speed_panel =
+                        (Panel_t){
+                            .x = 20,
+                            .y = 12,
+                            .head_text = "Speed:",
+                            .size = 0,
+                            .color = PANEL_COLOR_GREEN,
+                            .value = 0,
+                            .mode = -3,
+                            .draw = _drawPanel,
+                        },
 
-     .game_field = (GameField_t) {
-       .x = 0,
-       .y = 0,
-       .width = FIELD_WIDTH + 2,
-       .height = FIELD_HEIGHT + 2,
-       .tetris = tetris,
-       .drawField = _drawField,
-       .drawTetramino = _drawTetramino,
-     },
-     .draw = _drawWindow
-   }; 
+                    .game_field =
+                        (GameField_t){
+                            .x = 0,
+                            .y = 0,
+                            .width = FIELD_WIDTH + 2,
+                            .height = FIELD_HEIGHT + 2,
+                            .tetris = tetris,
+                            .drawField = _drawField,
+                            .drawTetramino = _drawTetramino,
+                        },
+                    .draw = _drawWindow};
 }
-
-

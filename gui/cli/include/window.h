@@ -48,4 +48,4 @@ typedef struct _window {
 
 Window_t _constructorWindow(Tetris_t *tetris);
 
-#endif  // WINDOW_H
+#endif // WINDOW_H

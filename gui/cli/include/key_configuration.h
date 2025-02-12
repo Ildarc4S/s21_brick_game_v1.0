@@ -5,4 +5,4 @@
 
 void initKeyboardConfiguration();
 
-#endif  // KEY_CONFIG_H
+#endif // KEY_CONFIG_H

@@ -166,18 +166,18 @@ void _destructorTetris(Tetris_t *this) {
   this->info.curr_tetramino = NULL;
 
   if (this->info.game_info.field) {
-    freeField(this->info.game_info.field, FIELD_HEIGHT + 2); 
+    freeField(this->info.game_info.field, FIELD_HEIGHT + 2);
     this->info.game_info.field = NULL;
   }
-  
+
   if (this->info.game_info.next) {
-    freeField(this->info.game_info.next, TETRAMINO_HEIGHT); 
+    freeField(this->info.game_info.next, TETRAMINO_HEIGHT);
     this->info.game_info.next = NULL;
   }
 
   if (this->collection) {
-     this->collection->destructor(this->collection);
-     this->collection = NULL;
+    this->collection->destructor(this->collection);
+    this->collection = NULL;
   }
   free(this);
 }
@@ -223,7 +223,6 @@ Tetris_t *constructorTetris() {
   return tetris_self;
 }
 
-
 // -1 - GAME_OVER
 // 0 - MOVE
 // 1 - PAUSE
@@ -236,8 +235,6 @@ Tetris_t *initTetris() {
   }
   return tetris;
 }
-
-
 
 GameInfo_t updateCurrentState() {
   Tetris_t *tetris = initTetris();

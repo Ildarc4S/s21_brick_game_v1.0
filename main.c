@@ -1,8 +1,8 @@
 #include <time.h>
 
-#include "gui/cli/include/key.h"
 #include "./gui/cli/include/key_configuration.h"
 #include "./gui/cli/include/window.h"
+#include "gui/cli/include/key.h"
 
 void gameLoop() {
   Tetris_t *tetris = initTetris();
@@ -12,8 +12,8 @@ void gameLoop() {
   initKeyboardConfiguration();
   while (tetris->state != EXIT) {
     redrawwin(stdscr); // Перерисовываем без очистки экрана
-                       
-    kb->listen(kb);      
+
+    kb->listen(kb);
     window.draw(&window);
 
     wnoutrefresh(stdscr); // Подготавливаем изменения
@@ -25,8 +25,8 @@ void gameLoop() {
 }
 
 int main() {
- initNcurses();
- srand(time(NULL));
- gameLoop();
- endwin();
+  initNcurses();
+  srand(time(NULL));
+  gameLoop();
+  endwin();
 }

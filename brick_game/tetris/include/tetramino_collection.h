@@ -7,8 +7,7 @@ typedef struct _tetramino_collection {
   Tetramino_t *tetraminos;
   int size;
 
-  void (*pushTetramino)(struct _tetramino_collection *,
-                        Tetramino_t);
+  void (*pushTetramino)(struct _tetramino_collection *, Tetramino_t);
 
   int (*getSize)(struct _tetramino_collection *);
   int (*setSize)(struct _tetramino_collection *, int);

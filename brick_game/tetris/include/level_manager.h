@@ -23,4 +23,4 @@ typedef struct _level {
 Level_t constructorLevel();
 Score_t constructorScore();
 
-#endif  // LEVEL_MANAGER_H
+#endif // LEVEL_MANAGER_H

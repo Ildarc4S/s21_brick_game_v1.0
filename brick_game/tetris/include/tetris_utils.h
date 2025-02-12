@@ -20,4 +20,4 @@ void rotateTetramino(Tetramino_t *tetramino);
 void shiftLines(Tetris_t *this, int *index);
 void cleanLines(Tetris_t *this);
 
-#endif  // TETRIS_UTILS_H
+#endif // TETRIS_UTILS_H

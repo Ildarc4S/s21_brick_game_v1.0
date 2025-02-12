@@ -1,4 +1,5 @@
 #include "./include/timer.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 void _updateCurrentTime(Timer_t *this) {
@@ -12,7 +13,7 @@ void _updateLastTime(Timer_t *this) { this->last_time = this->current_time; }
 long _calcTimeDiff(Timer_t *this) {
   this->updateCurrenTime(this);
   return (this->current_time.tv_sec - this->last_time.tv_sec) * 1000 +
-         (this->last_time.tv_usec - this->last_time.tv_usec) / 1000;
+         (this->current_time.tv_usec - this->last_time.tv_usec) / 1000;
 }
 
 long _getTimerTick(Timer_t *this) { return this->tick; }

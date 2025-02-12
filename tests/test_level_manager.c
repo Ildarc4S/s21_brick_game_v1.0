@@ -71,15 +71,15 @@ START_TEST(test_level_progression) {
 }
 END_TEST
 
-Suite* level_manager_suite(void) {
-    Suite* s = suite_create("Level Manager");
+Suite* tetris_level_manager_suite(void) {
+    Suite* s = suite_create("Tetris Level Manager");
     
-    TCase* tc_score = tcase_create("Score");
+    TCase* tc_score = tcase_create("Tetris Score");
     tcase_add_test(tc_score, test_score_basic);
     tcase_add_test(tc_score, test_score_line_conversion);
     suite_add_tcase(s, tc_score);
     
-    TCase* tc_level = tcase_create("Level");
+    TCase* tc_level = tcase_create("Tetris Level");
     tcase_add_test(tc_level, test_level_basic);
     tcase_add_test(tc_level, test_level_score_management);
     tcase_add_test(tc_level, test_level_progression);

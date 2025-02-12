@@ -6,4 +6,4 @@ void freeField(int **field, int height);
 
 void cleanField(int **field);
 
-#endif  // UTILS_H
+#endif // UTILS_H
