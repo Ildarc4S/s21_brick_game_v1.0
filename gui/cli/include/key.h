@@ -13,7 +13,7 @@ typedef struct _keyboard {
   int size;
 
   void (*listen)(struct _keyboard *);
-  void (*addKeyboardListener)(struct _keyboard *, int , void (*listenerFunc)(Button_t));
+  void (*addKeyboardListener)(struct _keyboard *, int, void (*listenerFunc)(Button_t));
   void (*destroyKeyboardListener)(struct _keyboard *);
 
   void (*destructor)(struct _keyboard *);

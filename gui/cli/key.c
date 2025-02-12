@@ -24,12 +24,14 @@ void _destroyKeyboardListener(Keyboard_t *kb) {
   }
 }
 
-Keyboard_t *_constructorKeyboard();
-void _destructorKeyboard(Keyboard_t *kb); 
+void _destructorKeyboard(Keyboard_t *kb) {
+  kb->destroyKeyboardListener(kb);
+  free(kb);
+}
 
 double calcDeltaTime(struct timeval current_time, struct timeval last_time) { 
  return (current_time.tv_sec - last_time.tv_sec) * 1000.0 +
-          (last_time.tv_usec - last_time.tv_usec) / 1000.0;
+          (current_time.tv_usec - last_time.tv_usec) / 1000.0;
 }
 
 bool isHold(int key, double hold_timeout) {
@@ -66,20 +68,14 @@ Keyboard_t *constructorKeyboard() {
 
   new_keyboard->destructor = _destructorKeyboard;
   new_keyboard->addKeyboardListener = _addKeyboardListener;
-  new_keyboard->destroyKeyboardListener = _destructorKeyboard;
-  
+  new_keyboard->destroyKeyboardListener = _destroyKeyboardListener;
+  new_keyboard->listen = _listen;
+
   new_keyboard->keyboard_listen_list = NULL;
   new_keyboard->size = 0;
 
-  new_keyboard->listen = _listen;
   return new_keyboard;
 }
-
-void _destructorKeyboard(Keyboard_t *kb) {
-  kb->destroyKeyboardListener(kb);
-  free(kb);
-}
-
 
 Keyboard_t* initKeyboard() {
   static Keyboard_t *keyboard = NULL;
@@ -88,5 +84,4 @@ Keyboard_t* initKeyboard() {
   }
   return keyboard;
 }
-
 

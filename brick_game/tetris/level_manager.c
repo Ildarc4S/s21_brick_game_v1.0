@@ -40,7 +40,7 @@ Score_t constructorScore() {
 
 Level_t constructorLevel() {
   return (Level_t){.level = 1,
-                   .max_level_score = 100,
+                   .max_level_score = 600,
                    .score = constructorScore(),
                    .getLevel = _getLevel,
                    .setLevel = _setLevel,

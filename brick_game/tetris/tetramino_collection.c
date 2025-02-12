@@ -77,8 +77,9 @@ void _pushTetraminoToCollection(TetraminoCollection_t *this,
 }
 
 void _destroyTetraminosFromCollection(TetraminoCollection_t *this) {
-  if (!this)
+  if (!this) {
     return;
+  }
 
   free(this->tetraminos);
   this->tetraminos = NULL;
@@ -86,8 +87,9 @@ void _destroyTetraminosFromCollection(TetraminoCollection_t *this) {
 }
 
 void _destructorTetraminoCollection(TetraminoCollection_t *this) {
-  if (!this)
+  if (!this) {
     return;
+  }
 
   _destroyTetraminosFromCollection(this);
   free(this);
@@ -113,7 +115,7 @@ TetraminoCollection_t *_constructorTetramino() {
 TetraminoCollection_t *initTetraminoCollection() {
   static TetraminoCollection_t *this = NULL;
 
-  if (!NULL) {
+  if (!this) {
     this = _constructorTetramino();
     initAllTetraminoCollectionBricks(this);
   }

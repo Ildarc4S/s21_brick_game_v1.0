@@ -10,6 +10,7 @@ void initNcurses() {
   nodelay(stdscr, TRUE);
   start_color();
   initColorPairs();
+  timeout(300);
 }
 
 void initColorPairs() {

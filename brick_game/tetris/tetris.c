@@ -161,7 +161,28 @@ void _updateTetrisLevel(Tetris_t *this) {
   this->info.game_info.level = this->level.getLevel(&this->level);
 }
 
-Tetris_t *createTetris() {
+void _destructorTetris(Tetris_t *this) {
+  this->info.next_tetramino = NULL;
+  this->info.curr_tetramino = NULL;
+
+  if (this->info.game_info.field) {
+    freeField(this->info.game_info.field, FIELD_HEIGHT + 2); 
+    this->info.game_info.field = NULL;
+  }
+  
+  if (this->info.game_info.next) {
+    freeField(this->info.game_info.next, TETRAMINO_HEIGHT); 
+    this->info.game_info.next = NULL;
+  }
+
+  if (this->collection) {
+     this->collection->destructor(this->collection);
+     this->collection = NULL;
+  }
+  free(this);
+}
+
+Tetris_t *constructorTetris() {
   Tetris_t *tetris_self = (Tetris_t *)malloc(sizeof(Tetris_t));
   if (!tetris_self)
     return NULL;
@@ -181,8 +202,9 @@ Tetris_t *createTetris() {
 
   tetris_self->db = initDatabase("./brick_game/db/tetris_db.txt");
   tetris_self->level = constructorLevel();
+  tetris_self->timer = constructorTimer(),
 
-  tetris_self->timer = constructorTimer(), tetris_self->left = _left;
+  tetris_self->left = _left;
   tetris_self->right = _right;
   tetris_self->down = _down;
   tetris_self->up = _up;
@@ -191,6 +213,7 @@ Tetris_t *createTetris() {
   tetris_self->spawn = _spawn;
   tetris_self->exit = _exitGame;
   tetris_self->pause = _pauseGame;
+  tetris_self->destructor = _destructorTetris;
 
   tetris_self->updateLevel = _updateTetrisLevel;
   tetris_self->updateScore = _updateTetrisScore;
@@ -200,6 +223,7 @@ Tetris_t *createTetris() {
   return tetris_self;
 }
 
+
 // -1 - GAME_OVER
 // 0 - MOVE
 // 1 - PAUSE
@@ -208,7 +232,7 @@ Tetris_t *createTetris() {
 Tetris_t *initTetris() {
   static Tetris_t *tetris = NULL;
   if (!tetris) {
-    tetris = createTetris();
+    tetris = constructorTetris();
   }
   return tetris;
 }
