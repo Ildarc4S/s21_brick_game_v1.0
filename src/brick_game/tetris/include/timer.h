@@ -31,9 +31,9 @@
  */
 typedef struct _timer {
   struct timeval current_time;  ///< Текущее время
-  struct timeval last_time;     ///< Время предыдущего обновления
-  long tick;                    ///< Текущий интервал между тиками (мс)
-  long default_tick;            ///< Интервал по умолчанию (мс)
+  struct timeval last_time;  ///< Время предыдущего обновления
+  long tick;  ///< Текущий интервал между тиками (мс)
+  long default_tick;  ///< Интервал по умолчанию (мс)
 
   /**
    * @brief Обновляет текущее время

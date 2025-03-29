@@ -31,7 +31,7 @@
  */
 typedef struct _tetramino_collection {
   Tetramino_t tetraminos[TETRAMINO_COLLCECTION_SIZE];  ///< Массив тетромино
-  int size;                                            ///< Размер коллекции
+  int size;  ///< Размер коллекции
   Tetramino_t *(*getRandomTetranimo)(
       struct _tetramino_collection
           *);  ///< Функция получения случайного тетромино

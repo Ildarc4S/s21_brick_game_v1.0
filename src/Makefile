@@ -33,7 +33,7 @@ TEST_EXEC = test_exec
 DOCGEN = doxygen
 DOXYFILE = tetris_doxy 
 
-CLANG_FORMAT = clang-format
+CLANG_FORMAT = clang-format-18
 CLANG_FORMAT_FLAGS = --style=Google --Werror --dry-run
 
 .PHONY: all install uninstall clean dvi dist test gcov_report rebuild valgrind_test clang_test clang_format

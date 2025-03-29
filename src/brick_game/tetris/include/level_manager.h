@@ -69,10 +69,10 @@ typedef struct _score {
  * @brief Структура для управления уровнем сложности
  */
 typedef struct _level {
-  Score_t score;        ///< Объект счета игрока
-  int level;            ///< Текущий уровень сложности
+  Score_t score;  ///< Объект счета игрока
+  int level;      ///< Текущий уровень сложности
   int max_level_score;  ///< Очков для перехода на след. уровень
-  int max_level;        ///< Максимальный уровень
+  int max_level;  ///< Максимальный уровень
   void (*updateLevel)(struct _level *);  ///< Функция обновления уровня
 } Level_t;
 

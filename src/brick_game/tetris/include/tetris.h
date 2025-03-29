@@ -62,21 +62,21 @@
  * Содержит все состояние игры, управляющие функции и компоненты.
  */
 typedef struct _tetris {
-  TetrisState_t state;               ///< Текущее состояние игры
-  GameInfo_t game_info;              ///< Информация о текущей игре
-  Tetramino_t curr_tetramino;        ///< Текущая падающая фигура
-  Tetramino_t *next_tetramino;       ///< Следующая фигура (превью)
+  TetrisState_t state;   ///< Текущее состояние игры
+  GameInfo_t game_info;  ///< Информация о текущей игре
+  Tetramino_t curr_tetramino;  ///< Текущая падающая фигура
+  Tetramino_t *next_tetramino;  ///< Следующая фигура (превью)
   TetraminoCollection_t collection;  ///< Коллекция всех возможных фигур
 
-  Timer_t timer;   ///< Таймер для управления скоростью
-  Level_t level;   ///< Уровень сложности
-  DataBase_t db;   ///< База данных для хранения рекордов
+  Timer_t timer;  ///< Таймер для управления скоростью
+  Level_t level;  ///< Уровень сложности
+  DataBase_t db;  ///< База данных для хранения рекордов
   int speed_diff;  ///< Разница скорости
   long tick_diff;  ///< Разница во времени между падениями
 
   // Указатели на функции управления игрой
-  void (*start)(struct _tetris *);         ///< Начать/продолжить игру
-  void (*spawn)(struct _tetris *);         ///< Создать новую фигуру
+  void (*start)(struct _tetris *);  ///< Начать/продолжить игру
+  void (*spawn)(struct _tetris *);  ///< Создать новую фигуру
   void (*action)(struct _tetris *, bool);  ///< Действие (поворот)
   void (*left)(struct _tetris *, bool);    ///< Движение влево
   void (*right)(struct _tetris *, bool);   ///< Движение вправо
@@ -84,11 +84,11 @@ typedef struct _tetris {
   void (*down)(struct _tetris *, bool);    ///< Движение вниз
   void (*pause)(struct _tetris *);         ///< Пауза игры
   void (*exit)(struct _tetris *);          ///< Выход из игры
-  void (*restoreInfo)(struct _tetris *);   ///< Сброс состояния игры
+  void (*restoreInfo)(struct _tetris *);  ///< Сброс состояния игры
 
   // Функции обновления состояния
-  void (*updateScore)(struct _tetris *);        ///< Обновление счета
-  void (*updateLevel)(struct _tetris *);        ///< Обновление уровня
+  void (*updateScore)(struct _tetris *);  ///< Обновление счета
+  void (*updateLevel)(struct _tetris *);  ///< Обновление уровня
   void (*updateTetrisState)(struct _tetris *);  ///< Обновление состояния игры
 } Tetris_t;
 
