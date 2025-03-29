@@ -1,0 +1,26 @@
+PROJECT_NAME           = "Tetris Library"
+
+OUTPUT_DIRECTORY       = docs
+OUTPUT_LANGUAGE        = RUSSIAN 
+
+FILE_PATTERNS          = *.c *.h
+
+INPUT                  = brick_game/tetris brick_game/spec
+OUTPUT_DIRECTORY       = docs/tetris
+RECURSIVE              = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = YES
+
+HAVE_DOT               = YES
+DOT_PATH               = /usr/bin/dot
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+
+EXTRACT_ALL            = YES
+
+SOURCE_BROWSER         = YES
+INLINE_INHERITED_MEMBERS = YES
+
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = NO
+
