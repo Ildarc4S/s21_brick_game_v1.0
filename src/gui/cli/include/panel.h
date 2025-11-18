@@ -14,7 +14,7 @@
 #define PANEL_CELL_WIDTH 2
 
 #define PANEL_TEXT_SIZE 50
-#define PANEL_TEXT_LINE_COUNT 12
+#define PANEL_TEXT_LINE_COUNT 6
 #define PANEL_TEXT_LINE_COUNT_ZERO 0
 
 typedef struct _panel {

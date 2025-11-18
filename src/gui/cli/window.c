@@ -21,13 +21,7 @@ Window_t initWindow() {
                              "Press s to start",
                              "Press left/right to move figure",
                              "Press down to move figure down",
-                             "Press space to rotate figure",
-                             "Press q to quit",
-                             "Press p to pause",
-                             "Press s to start",
-                             "Press left/right to move snake horizontally",
-                             "Press up/down to move snake vertically",
-                             "Press space to boost snake"};
+                             "Press space to rotate figure"};
 
   return (Window_t){
       .help_panel = initPanel(WINDOW_PANEL_COLUMN_ONE_X, WINDOW_PANEL_HELP_Y,
